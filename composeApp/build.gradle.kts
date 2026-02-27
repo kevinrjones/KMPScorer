@@ -11,7 +11,7 @@ plugins {
 
 kotlin {
     androidLibrary {
-        namespace = "compose.project.demo.composedemo"
+        namespace = "cricket.knowledgespike.scorerlibrary"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
 
         compilerOptions {
