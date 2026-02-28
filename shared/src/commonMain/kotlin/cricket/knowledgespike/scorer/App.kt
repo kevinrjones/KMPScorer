@@ -15,9 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import org.jetbrains.compose.resources.painterResource
-
-import kmpscorer.composeapp.generated.resources.Res
-import kmpscorer.composeapp.generated.resources.compose_multiplatform
+import kmpscorer.shared.generated.resources.Res
+import kmpscorer.shared.generated.resources.compose_multiplatform
 
 @Composable
 @Preview
