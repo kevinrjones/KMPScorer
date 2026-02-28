@@ -18,6 +18,9 @@ kotlin {
         implementation(projects.shared)
         implementation(libs.androidx.activity.compose)
         implementation(libs.compose.uiToolingPreview)
+        implementation(libs.androidx.room.sqlite.wrapper)
+        implementation(libs.ktor.client.okhttp)
+        implementation(libs.koin.android)
     }
 }
 
