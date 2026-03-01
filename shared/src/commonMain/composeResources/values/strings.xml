@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="app_name">scorer</string>
+    <string name="save">Save</string>
+    <string name="edit">Edit</string>
+    <string name="cancel">Cancel</string>
+    <string name="score">Score</string>
+    <string name="add_a_scorecard_descrirption">Add a scorecard</string>
+    <string name="team_label">Team</string>
+    <string name="opponents_label">Opponents</string>
+    <string name="date_label">Date</string>
+    <string name="venue_label">Venue</string>
+    <string name="title_label">Match title</string>
+    <string name="batting_side_label">Batting side</string>
+    <string name="umpire1_label">Umpire 1</string>
+    <string name="umpire2_label">Umpire 2</string>
+    <string name="third_umpire_label">Third umpire</string>
+    <string name="referee_label">Referee</string>
+    <string name="scorer1_label">Scorer 1</string>
+    <string name="scorer2_label">Scorer 2</string>
+    <string name="type_of_match_label">Type of match</string>
+    <string name="duration_label">Duration</string>
+    <string name="start_time_label">Start time</string>
+    <string name="team_winning_toss_label">Team winning toss</string>
+    <string name="weather_label">Weather</string>
+    <string name="pitch_conditions_label">Pitch conditions</string>
+    <string name="saved_scorecard">Scorecard saved</string>
+    <string name="unable_to_save_scorecard">Unable to save scorecard</string>
+    <string name="missing_team_name">You must provide the team name</string>
+    <string name="missing_opponents_name">You must provide the opponents name</string>
+    <string name="missing_date">You must provide the date</string>
+    <string name="missing_match_title">You must provide the title</string>
+    <string name="missing_venue">You must provide the venue</string>
+    <string name="missing_scorer">You must provide the scorer</string>
+    <string name="missing_type_of_match">You must provide the type of match</string>
+    <string name="missing_duration">You must provide the duration</string>
+    <string name="missing_start_time">You must provide the start time</string>
+    <string name="invalid_batting_side_name">You must provide the batting side and it must be the same as either team or opponents</string>
+    <string name="invalid_team_winning_toss_name">You must provide the name of the team winning the toss and it must be the same as either team or opponents</string>
+    <string name="time_label">Time</string>"
+    <string name="over_label">Overs</string>"
+    <string name="bowlers_label">Bowlers</string>"
+    <string name="end_label">End</string>"
+</resources>

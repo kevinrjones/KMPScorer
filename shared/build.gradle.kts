@@ -67,6 +67,8 @@ kotlin {
             api(libs.koin.core)
 
             implementation(libs.bundles.ktor)
+
+            implementation(libs.arrow.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
