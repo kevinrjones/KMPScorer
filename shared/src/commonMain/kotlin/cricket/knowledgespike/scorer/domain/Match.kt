@@ -1,6 +1,6 @@
 package cricket.knowledgespike.scorer.domain
 
-data class Match(
+data class MatchDetails(
     val id: Int?,
     val teamName: String,
     val opponentsName: String,

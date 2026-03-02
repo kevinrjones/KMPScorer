@@ -1,4 +1,4 @@
-package cricket.knowledgespike.scorer.add_edit_scorecard.presentation
+package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cricket.knowledgespike.scorer.feature.find.match_list.presentation.MatchListVewModel
 import cricket.knowledgespike.scorer.ui.theme.ScorerTheme
 import kmpscorer.shared.generated.resources.Res
 import kmpscorer.shared.generated.resources.batting_side_label
@@ -73,6 +74,15 @@ import kmpscorer.shared.generated.resources.venue_label
 import kmpscorer.shared.generated.resources.weather_label
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun AddEditScorecardScreenRoot(
+    viewModel: AddEditScorecardViewModel = koinViewModel<AddEditScorecardViewModel>(),
+    onSaveOrCancel: () -> Unit,
+) {
+    AddEditScorecardScreen(onSaveOrCancel = onSaveOrCancel)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,6 +101,7 @@ fun AddEditScorecardScreen(
     }
 
     Scaffold(
+        modifier = Modifier.background(MaterialTheme.colorScheme.background),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(

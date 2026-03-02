@@ -1,10 +1,11 @@
-package cricket.knowledgespike.scorer.add_edit_scorecard.presentation
+package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.presentation
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.MatchDetails
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -29,9 +30,9 @@ class AddEditScorecardViewModel(
 ) : ViewModel() {
 
     private val _scorecard = mutableStateOf(
-        VmScorecard()
+        MatchDetails()
     )
-    val scorecard: State<VmScorecard> = _scorecard
+    val scorecard: State<MatchDetails> = _scorecard
 
     private val _eventFlow = MutableSharedFlow<AddEditScorecardEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -55,7 +56,6 @@ class AddEditScorecardViewModel(
 
             AddEditScorecardUiEvent.SaveScorecard -> {
                 viewModelScope.launch {
-
                     // todo: log the issues here - need to add analytics
                 }
             }
@@ -153,24 +153,3 @@ sealed interface AddEditScorecardUiEvent {
 }
 
 
-data class VmScorecard(
-    val id: Int? = null,
-    val teamName: String = "",
-    val opponentsName: String = "",
-    val venue: String = "",
-    val title: String = "",
-    val matchDate: String = "",
-    val battingSide: String = "",
-    val umpire1Name: String? = null,
-    val umpire2Name: String? = null,
-    val thirdUmpireName: String? = null,
-    val refereeName: String? = null,
-    val scorer1Name: String = "",
-    val scorer2Name: String? = null,
-    val typeOfMatch: String = "",
-    val duration: String = "",
-    val startTime: String = "",
-    val teamWinningToss: String = "",
-    val weather: String? = null,
-    val pitchCondition: String? = "",
-)

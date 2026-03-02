@@ -41,4 +41,5 @@
     <string name="over_label">Overs</string>"
     <string name="bowlers_label">Bowlers</string>"
     <string name="end_label">End</string>"
+    <string name="search">Search</string>"
 </resources>
