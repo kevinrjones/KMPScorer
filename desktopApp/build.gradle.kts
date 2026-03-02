@@ -15,7 +15,7 @@ kotlin {
         implementation(libs.ktor.client.okhttp)
         implementation(libs.koin.core)
         implementation(libs.koin.jvm)
-
+        implementation(libs.jetbrains.compose.windowsizeclass)
     }
 }
 

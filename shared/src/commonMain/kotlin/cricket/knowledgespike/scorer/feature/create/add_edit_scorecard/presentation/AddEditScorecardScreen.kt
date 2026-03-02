@@ -79,9 +79,13 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun AddEditScorecardScreenRoot(
     viewModel: AddEditScorecardViewModel = koinViewModel<AddEditScorecardViewModel>(),
+    isExpandedScreen: Boolean = false,
     onSaveOrCancel: () -> Unit,
 ) {
-    AddEditScorecardScreen(onSaveOrCancel = onSaveOrCancel)
+    AddEditScorecardScreen(
+        isExpandedScreen = isExpandedScreen,
+        onSaveOrCancel = onSaveOrCancel
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

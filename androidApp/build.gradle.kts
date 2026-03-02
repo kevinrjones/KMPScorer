@@ -21,7 +21,8 @@ kotlin {
         implementation(libs.androidx.room.sqlite.wrapper)
         implementation(libs.ktor.client.okhttp)
         implementation(libs.koin.android)
-        implementation(libs.androidx.compose.materialWindow)
+        implementation(libs.jetbrains.compose.windowsizeclass)
+
     }
 }
 
