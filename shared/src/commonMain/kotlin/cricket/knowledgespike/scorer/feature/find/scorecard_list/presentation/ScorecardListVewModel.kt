@@ -1,21 +1,18 @@
-package cricket.knowledgespike.scorer.feature.find.match_list.presentation
+package cricket.knowledgespike.scorer.feature.find.scorecard_list.presentation
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class MatchListVewModel : ViewModel() {
-    private val _state = MutableStateFlow(MatchListState())
+class ScorecardListVewModel : ViewModel() {
+    private val _state = MutableStateFlow(ScorecardListState())
     val state = _state.asStateFlow()
 
 
-    fun onAction(action: MatchListAction) {
+    fun onAction(action: ScorecardListAction) {
         when(action) {
-            is MatchListAction.OnMatchClick -> {
-
-            }
-            is MatchListAction.OnSearchQueryChange -> {
+            is ScorecardListAction.OnSearchQueryChange -> {
                 _state.update {
                     it.copy(
                         teamSearchName = action.team,
@@ -23,7 +20,8 @@ class MatchListVewModel : ViewModel() {
                     )
                 }
             }
+            is ScorecardListAction.onAddOrEditScorecard -> Unit
+            is ScorecardListAction.onScore -> Unit
         }
     }
-
 }

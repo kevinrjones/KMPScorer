@@ -1,43 +1,28 @@
 package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.presentation
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.MatchDetails
+import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.AddEditScorecardUseCases
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class FieldChanges(
-    val teamNameChanged: Boolean = false,
-    val opponentsNameChanged: Boolean = false,
-    val dateChanged: Boolean = false,
-    val venueChanged: Boolean = false,
-    val titleChanged: Boolean = false,
-    val matchDateChanged: Boolean = false,
-    val battingSideChanged: Boolean = false,
-    val scorer1NameChanged: Boolean = false,
-    val durationChanged: Boolean = false,
-    val typeOfMatchChanged: Boolean = false,
-    val startTimeChanged: Boolean = false,
-    val teamWinningTossChanged: Boolean = false,
-)
 
 class AddEditScorecardViewModel(
-    savedStateHandle: SavedStateHandle?
+    savedStateHandle: SavedStateHandle?,
+    val addEditScorecardUseCases: AddEditScorecardUseCases
 ) : ViewModel() {
 
-    private val _scorecard = mutableStateOf(
-        MatchDetails()
-    )
-    val scorecard: State<MatchDetails> = _scorecard
+    private val _state = MutableStateFlow(AddEditScorecardState())
+    val state = _state.asStateFlow()
 
     private val _eventFlow = MutableSharedFlow<AddEditScorecardEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    var fieldChanges = FieldChanges()
 
     init {
         val scorecardId = savedStateHandle?.get<Int>("scorecardId")
@@ -61,19 +46,19 @@ class AddEditScorecardViewModel(
             }
 
             is AddEditScorecardUiEvent.EnteredTeamName -> {
-                fieldChanges = fieldChanges.copy(teamNameChanged = true)
+                _state.update { it.copy(teamNameChanged = true) }
             }
 
             is AddEditScorecardUiEvent.EnteredOpponentsName -> {
-                fieldChanges = fieldChanges.copy(opponentsNameChanged = true)
+                _state.update { it.copy(opponentsNameChanged = true) }
             }
 
             is AddEditScorecardUiEvent.EnteredDate -> {
-                fieldChanges = fieldChanges.copy(dateChanged = true)
+                _state.update { it.copy(matchDateChanged = true) }
             }
 
             is AddEditScorecardUiEvent.EnteredBattingSide -> {
-                fieldChanges = fieldChanges.copy(battingSideChanged = true)
+                _state.update { it.copy(battingSideChanged = true) }
             }
 
             is AddEditScorecardUiEvent.EnteredPitchCondition -> Unit
@@ -81,40 +66,40 @@ class AddEditScorecardViewModel(
             is AddEditScorecardUiEvent.EnteredReferee -> Unit
 
             is AddEditScorecardUiEvent.EnteredScorer1Name -> {
-                fieldChanges = fieldChanges.copy(scorer1NameChanged = true)
+                _state.update { it.copy(scorer1NameChanged = true) }
             }
 
             is AddEditScorecardUiEvent.EnteredScorer2Name -> Unit
 
             is AddEditScorecardUiEvent.EnteredStartTime -> {
-                fieldChanges = fieldChanges.copy(startTimeChanged = true)
+                _state.update { it.copy(startTimeChanged = true) }
             }
 
             is AddEditScorecardUiEvent.EnteredTeamWinningToss -> {
-                fieldChanges = fieldChanges.copy(teamWinningTossChanged = true)
+                _state.update { it.copy(teamWinningTossChanged = true) }
             }
 
             is AddEditScorecardUiEvent.EnteredThirdUmpireName -> Unit
 
             is AddEditScorecardUiEvent.EnteredTitle -> {
-                fieldChanges = fieldChanges.copy(titleChanged = true)
+                _state.update { it.copy(titleChanged = true) }
             }
 
             is AddEditScorecardUiEvent.EnteredTypeOfMatch -> {
-                fieldChanges = fieldChanges.copy(typeOfMatchChanged = true)
+                _state.update { it.copy(typeOfMatchChanged = true) }
             }
 
-            is AddEditScorecardUiEvent.EnteredUmpire1Name ->  Unit
+            is AddEditScorecardUiEvent.EnteredUmpire1Name -> Unit
 
-            is AddEditScorecardUiEvent.EnteredUmpire2Name ->  Unit
+            is AddEditScorecardUiEvent.EnteredUmpire2Name -> Unit
 
             is AddEditScorecardUiEvent.EnteredVenue -> {
-                fieldChanges = fieldChanges.copy(venueChanged = true)
+                _state.update { it.copy(venueChanged = true) }
             }
 
-            is AddEditScorecardUiEvent.EnteredWeather ->  Unit
+            is AddEditScorecardUiEvent.EnteredWeather -> Unit
             is AddEditScorecardUiEvent.EnteredDuration -> {
-                fieldChanges = fieldChanges.copy(durationChanged = true)
+                _state.update { it.copy(durationChanged = true) }
             }
         }
     }

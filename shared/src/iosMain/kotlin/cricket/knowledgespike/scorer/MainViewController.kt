@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName", "unused")
+
 package cricket.knowledgespike.scorer
 
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi

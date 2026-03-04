@@ -1,0 +1,47 @@
+package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.presentation
+
+data class AddEditScorecardState(
+    val teamName: String = "",
+    val teamNameChanged: Boolean = false,
+
+    val opponentsName: String = "",
+    val opponentsNameChanged: Boolean = false,
+
+    val venue: String = "",
+    val venueChanged: Boolean = false,
+
+    val title: String = "",
+    val titleChanged: Boolean = false,
+
+    val matchDate: String = "",
+    val matchDateChanged: Boolean = false,
+
+    val battingSide: String = "",
+    val battingSideChanged: Boolean = false,
+
+    val umpire1Name: String? = null,
+    val umpire2Name: String? = null,
+    val thirdUmpireName: String? = null,
+    val refereeName: String? = null,
+
+    val scorer1Name: String = "",
+    val scorer1NameChanged: Boolean = false,
+
+    val scorer2Name: String? = null,
+
+    val typeOfMatch: String = "",
+    val typeOfMatchChanged: Boolean = false,
+
+    val duration: String = "",
+    val durationChanged: Boolean = false,
+
+    val startTime: String = "",
+    val startTimeChanged: Boolean = false,
+
+    val teamWinningToss: String = "",
+    val teamWinningTossChanged: Boolean = false,
+
+    val weather: String? = null,
+    val pitchCondition: String? = "",
+
+)
