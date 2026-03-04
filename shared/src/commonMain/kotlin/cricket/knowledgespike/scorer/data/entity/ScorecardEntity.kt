@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardFullDetails
 
 @Entity(tableName = "Scorecards")
-data class Scorecard(
+data class ScorecardEntity(
     @PrimaryKey(autoGenerate = true) val id: Int? = null,
     val teamName: String,
     val opponentsName: String,
@@ -27,8 +27,32 @@ data class Scorecard(
     val pitchCondition: String?
 )
 
-fun ScorecardFullDetails.toEntity(): Scorecard {
-    return Scorecard(
+fun ScorecardFullDetails.toEntity(): ScorecardEntity {
+    return ScorecardEntity(
+        id = id,
+        teamName = teamName,
+        opponentsName = opponentsName,
+        venue = venue,
+        title = title,
+        matchDate = matchDate,
+        battingSide = battingSide,
+        umpire1Name = umpire1Name,
+        umpire2Name = umpire2Name,
+        thirdUmpireName = thirdUmpireName,
+        refereeName = refereeName,
+        scorer1Name = scorer1Name,
+        scorer2Name = scorer2Name,
+        typeOfMatch = typeOfMatch,
+        duration = duration,
+        startTime = startTime,
+        teamWinningToss = teamWinningToss,
+        weather = weather,
+        pitchCondition = pitchCondition
+    )
+
+}
+fun ScorecardEntity.toScorecardFullDetails(): ScorecardFullDetails {
+    return ScorecardFullDetails(
         id = id,
         teamName = teamName,
         opponentsName = opponentsName,

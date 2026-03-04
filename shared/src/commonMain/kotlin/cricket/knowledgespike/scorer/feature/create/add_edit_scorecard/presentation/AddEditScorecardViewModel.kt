@@ -42,7 +42,7 @@ class AddEditScorecardViewModel(
             AddEditScorecardUiEvent.SaveScorecard -> {
                 viewModelScope.launch {
                     if (isScorecardValid()) {
-//                        addEditScorecardUseCases.upsertScorecard(scorecard = state.value.toScoreCardFullDetails())
+                        addEditScorecardUseCases.upsertScorecard(scorecard = state.value.toScoreCardFullDetails())
                         _addEditScoorecardEvent.emit(AddEditScorecardEvent.SavedScorecard)
                     } else {
                         _addEditScoorecardEvent.emit(AddEditScorecardEvent.ErrorSavingScorecard)

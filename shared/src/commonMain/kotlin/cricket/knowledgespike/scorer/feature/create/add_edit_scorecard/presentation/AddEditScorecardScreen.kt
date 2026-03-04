@@ -1,3 +1,4 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
 package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.presentation
 
 import androidx.compose.foundation.background
@@ -6,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -61,7 +63,6 @@ import kmpscorer.shared.generated.resources.umpire2_label
 import kmpscorer.shared.generated.resources.unable_to_save_scorecard
 import kmpscorer.shared.generated.resources.venue_label
 import kmpscorer.shared.generated.resources.weather_label
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -75,36 +76,12 @@ fun AddEditScorecardScreenRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    AddEditScorecardScreen(
-        useCases = viewModel.addEditScorecardUseCases,
-        state = state,
-        emittedScorecardEvents = viewModel.addEditScoorecardEvent,
-        onUiEvent = viewModel::onEvent,
-        onSaveOrCancel = onSaveOrCancel,
-        isExpandedScreen = isExpandedScreen,
-        isValid = viewModel.isValid
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun AddEditScorecardScreen(
-    useCases: AddEditScorecardUseCases,
-    state: AddEditScorecardState,
-    emittedScorecardEvents: SharedFlow<AddEditScorecardEvent>,
-    onUiEvent: (AddEditScorecardUiEvent) -> Unit,
-    onSaveOrCancel: () -> Unit,
-    isExpandedScreen: Boolean = false,
-    isValid: Boolean = false,
-    modifier: Modifier = Modifier,
-) {
-
     val snackbarHostState = remember { SnackbarHostState() }
     val savedMessage = stringResource(Res.string.saved_scorecard)
     val unableToSaveScorecardMessage = stringResource(Res.string.unable_to_save_scorecard)
 
     LaunchedEffect(true) {
-        emittedScorecardEvents.collectLatest { event ->
+        viewModel.addEditScoorecardEvent.collectLatest { event ->
             when (event) {
                 AddEditScorecardEvent.SavedScorecard -> {
                     snackbarHostState.showSnackbar(message = savedMessage)
@@ -132,55 +109,82 @@ fun AddEditScorecardScreen(
             )
         }
 
-    ) { innerPadding ->
+    ) { innerPadding: PaddingValues ->
 
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            Row(modifier = Modifier.weight(0.9f)) {
-                if (!isExpandedScreen) {
-                    SingleColumnDisplay(
-                        useCases = useCases,
-                        state = state,
-                        modifier = modifier,
-                        onEvent = onUiEvent
-                    )
-                } else {
-                    TwoColumnDisplay(
-                        useCases = useCases,
-                        state = state,
-                        onEvent = onUiEvent
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-            HorizontalDivider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .border(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(onClick = {
-                    onUiEvent(AddEditScorecardUiEvent.SaveScorecard)
-                }, enabled = isValid) {
-                    Text(text = stringResource(Res.string.save))
-                }
-
-                Button(onClick = onSaveOrCancel) {
-                    Text(text = stringResource(Res.string.cancel))
-                }
-            }
-            Spacer(modifier = Modifier.height(4.dp))
-        }
-
+        AddEditScorecardScreen(
+            innerPadding = innerPadding,
+            useCases = viewModel.addEditScorecardUseCases,
+            state = state,
+            onUiEvent = viewModel::onEvent,
+            onSaveOrCancel = onSaveOrCancel,
+            isExpandedScreen = isExpandedScreen,
+            isValid = viewModel.isValid
+        )
     }
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddEditScorecardScreen(
+    innerPadding: PaddingValues,
+    useCases: AddEditScorecardUseCases,
+    state: AddEditScorecardState,
+    onUiEvent: (AddEditScorecardUiEvent) -> Unit,
+    onSaveOrCancel: () -> Unit,
+    isExpandedScreen: Boolean = false,
+    isValid: Boolean = false,
+    modifier: Modifier = Modifier,
+) {
+
+
+    Column(
+        modifier = Modifier.padding(innerPadding)
+            .fillMaxSize()
+    ) {
+
+        Row(modifier = Modifier.weight(0.9f)) {
+            if (!isExpandedScreen) {
+                SingleColumnDisplay(
+                    useCases = useCases,
+                    state = state,
+                    modifier = modifier,
+                    onEvent = onUiEvent
+                )
+            } else {
+                TwoColumnDisplay(
+                    useCases = useCases,
+                    state = state,
+                    onEvent = onUiEvent
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+        HorizontalDivider(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .border(width = 1.dp, color = MaterialTheme.colorScheme.outlineVariant)
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Button(onClick = {
+                onUiEvent(AddEditScorecardUiEvent.SaveScorecard)
+            }, enabled = isValid) {
+                Text(text = stringResource(Res.string.save))
+            }
+
+            Button(onClick = onSaveOrCancel) {
+                Text(text = stringResource(Res.string.cancel))
+            }
+        }
+        Spacer(modifier = Modifier.height(4.dp))
+    }
+
+}
+
 
 @Composable
 fun TwoColumnDisplay(
@@ -521,7 +525,7 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.title,
             labelId = Res.string.title_label,
-            isError = result.error  && state.titleChanged,
+            isError = result.error && state.titleChanged,
             errorMessage = result.errorMessage,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredTitle(it))
@@ -604,7 +608,7 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.scorer1Name,
             labelId = Res.string.scorer1_label,
-            isError = result.error  && state.scorer1NameChanged,
+            isError = result.error && state.scorer1NameChanged,
             errorMessage = result.errorMessage,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredScorer1Name(it))
@@ -670,7 +674,7 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.teamWinningToss,
             labelId = Res.string.team_winning_toss_label,
-            isError = result.error,
+            isError = result.error && state.teamWinningTossChanged,
             errorMessage = result.errorMessage,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredTeamWinningToss(it))
