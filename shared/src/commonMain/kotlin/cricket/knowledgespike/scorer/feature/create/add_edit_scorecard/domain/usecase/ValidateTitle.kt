@@ -3,9 +3,11 @@ package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.u
 import cricket.knowledgespike.scorer.foundation.ValidationResult
 import cricket.knowledgespike.scorer.foundation.isEmptyValidation
 import kmpscorer.shared.generated.resources.Res
-import kmpscorer.shared.generated.resources.missing_team_name
+import kmpscorer.shared.generated.resources.missing_match_title
 
-class ValidateTeamName {
-    operator fun invoke(name: String) : ValidationResult = isEmptyValidation(name, Res.string.missing_team_name)
+class ValidateTitle {
+    operator fun invoke(title: String) : ValidationResult {
+        return isEmptyValidation(title, Res.string.missing_match_title)
+    }
 }
 

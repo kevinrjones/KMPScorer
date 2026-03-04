@@ -41,67 +41,103 @@ class AddEditScorecardViewModel(
 
             AddEditScorecardUiEvent.SaveScorecard -> {
                 viewModelScope.launch {
-                    // todo: log the issues here - need to add analytics
+                    if (isScorecardValid()) {
+                        addEditScorecardUseCases.upsertScorecard(scorecard = state.value.toScoreCardFullDetails())
+                        _eventFlow.emit(AddEditScorecardEvent.SavedScorecard)
+                    } else {
+                        _eventFlow.emit(AddEditScorecardEvent.ErrorSavingScorecard)
+                    }
                 }
             }
 
             is AddEditScorecardUiEvent.EnteredTeamName -> {
-                _state.update { it.copy(teamNameChanged = true) }
+                _state.update { it.copy(teamNameChanged = true, teamName = event.teamName) }
             }
 
             is AddEditScorecardUiEvent.EnteredOpponentsName -> {
-                _state.update { it.copy(opponentsNameChanged = true) }
+                _state.update {
+                    it.copy(
+                        opponentsNameChanged = true,
+                        opponentsName = event.opponentsName
+                    )
+                }
             }
 
             is AddEditScorecardUiEvent.EnteredDate -> {
-                _state.update { it.copy(matchDateChanged = true) }
+                _state.update { it.copy(matchDateChanged = true, matchDate = event.matchDate) }
             }
 
             is AddEditScorecardUiEvent.EnteredBattingSide -> {
-                _state.update { it.copy(battingSideChanged = true) }
+                _state.update {
+                    it.copy(
+                        battingSideChanged = true,
+                        battingSide = event.battingSide
+                    )
+                }
             }
 
-            is AddEditScorecardUiEvent.EnteredPitchCondition -> Unit
+            is AddEditScorecardUiEvent.EnteredPitchCondition ->
+                _state.update { it.copy(pitchCondition = event.pitchCondition) }
 
-            is AddEditScorecardUiEvent.EnteredReferee -> Unit
+            is AddEditScorecardUiEvent.EnteredReferee ->
+                _state.update { it.copy(refereeName = event.name) }
 
             is AddEditScorecardUiEvent.EnteredScorer1Name -> {
-                _state.update { it.copy(scorer1NameChanged = true) }
+                _state.update { it.copy(scorer1NameChanged = true, scorer1Name = event.name) }
             }
 
-            is AddEditScorecardUiEvent.EnteredScorer2Name -> Unit
+            is AddEditScorecardUiEvent.EnteredScorer2Name -> _state.update { it.copy(scorer2Name = event.name) }
 
             is AddEditScorecardUiEvent.EnteredStartTime -> {
-                _state.update { it.copy(startTimeChanged = true) }
+                _state.update { it.copy(startTimeChanged = true, startTime = event.startTime) }
             }
 
             is AddEditScorecardUiEvent.EnteredTeamWinningToss -> {
-                _state.update { it.copy(teamWinningTossChanged = true) }
+                _state.update {
+                    it.copy(
+                        teamWinningTossChanged = true,
+                        teamWinningToss = event.teamWinningToss
+                    )
+                }
             }
 
-            is AddEditScorecardUiEvent.EnteredThirdUmpireName -> Unit
+            is AddEditScorecardUiEvent.EnteredThirdUmpireName -> _state.update {
+                it.copy(
+                    thirdUmpireName = event.name
+                )
+            }
 
             is AddEditScorecardUiEvent.EnteredTitle -> {
-                _state.update { it.copy(titleChanged = true) }
+                _state.update { it.copy(titleChanged = true, title = event.title) }
             }
 
             is AddEditScorecardUiEvent.EnteredTypeOfMatch -> {
-                _state.update { it.copy(typeOfMatchChanged = true) }
+                _state.update {
+                    it.copy(
+                        typeOfMatchChanged = true,
+                        typeOfMatch = event.typeOfMatch
+                    )
+                }
             }
 
-            is AddEditScorecardUiEvent.EnteredUmpire1Name -> Unit
+            is AddEditScorecardUiEvent.EnteredUmpire1Name -> _state.update { it.copy(umpire1Name = event.name) }
 
-            is AddEditScorecardUiEvent.EnteredUmpire2Name -> Unit
+            is AddEditScorecardUiEvent.EnteredUmpire2Name -> _state.update { it.copy(umpire2Name = event.name) }
 
             is AddEditScorecardUiEvent.EnteredVenue -> {
-                _state.update { it.copy(venueChanged = true) }
+                _state.update { it.copy(venueChanged = true, venue = event.venue) }
             }
 
-            is AddEditScorecardUiEvent.EnteredWeather -> Unit
+            is AddEditScorecardUiEvent.EnteredWeather -> _state.update { it.copy(weather = event.weather) }
             is AddEditScorecardUiEvent.EnteredDuration -> {
-                _state.update { it.copy(durationChanged = true) }
+                _state.update { it.copy(durationChanged = true, duration = event.duration) }
             }
         }
+    }
+
+    private fun isScorecardValid(): Boolean {
+        return addEditScorecardUseCases.validateTeamName(state.value.teamName).successful
+                && addEditScorecardUseCases.validateTeamName(state.value.opponentsName).successful
     }
 
     fun isEmpty(value: String, changed: Boolean): Boolean {

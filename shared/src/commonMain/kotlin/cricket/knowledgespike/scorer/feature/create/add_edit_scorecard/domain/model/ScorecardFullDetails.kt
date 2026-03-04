@@ -21,3 +21,4 @@ data class ScorecardFullDetails(
     val weather: String? = null,
     val pitchCondition: String? = "",
 )
+
