@@ -20,8 +20,8 @@ class AddEditScorecardViewModel(
     private val _state = MutableStateFlow(AddEditScorecardState())
     val state = _state.asStateFlow()
 
-    private val _eventFlow = MutableSharedFlow<AddEditScorecardEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
+    private val _addEditScoorecardEvent = MutableSharedFlow<AddEditScorecardEvent>()
+    val addEditScoorecardEvent = _addEditScoorecardEvent.asSharedFlow()
 
 
     init {
@@ -33,7 +33,7 @@ class AddEditScorecardViewModel(
     }
 
     val isValid: Boolean
-        get() = true
+        get() = isScorecardValid()
 
 
     fun onEvent(event: AddEditScorecardUiEvent) {
@@ -42,16 +42,16 @@ class AddEditScorecardViewModel(
             AddEditScorecardUiEvent.SaveScorecard -> {
                 viewModelScope.launch {
                     if (isScorecardValid()) {
-                        addEditScorecardUseCases.upsertScorecard(scorecard = state.value.toScoreCardFullDetails())
-                        _eventFlow.emit(AddEditScorecardEvent.SavedScorecard)
+//                        addEditScorecardUseCases.upsertScorecard(scorecard = state.value.toScoreCardFullDetails())
+                        _addEditScoorecardEvent.emit(AddEditScorecardEvent.SavedScorecard)
                     } else {
-                        _eventFlow.emit(AddEditScorecardEvent.ErrorSavingScorecard)
+                        _addEditScoorecardEvent.emit(AddEditScorecardEvent.ErrorSavingScorecard)
                     }
                 }
             }
 
             is AddEditScorecardUiEvent.EnteredTeamName -> {
-                _state.update { it.copy(teamNameChanged = true, teamName = event.teamName) }
+                        _state.update { it.copy(teamNameChanged = true, teamName = event.teamName) }
             }
 
             is AddEditScorecardUiEvent.EnteredOpponentsName -> {

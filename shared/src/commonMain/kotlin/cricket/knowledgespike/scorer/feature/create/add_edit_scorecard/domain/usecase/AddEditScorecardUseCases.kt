@@ -12,5 +12,5 @@ data class AddEditScorecardUseCases(
     val validateDuration: ValidateDuration,
     val validateStartTime: ValidateStartTime,
     val validateTeamWinningToss: ValidateTeamWinningToss,
-    val upsertScorecard: UpsertScorecard
+//    val upsertScorecard: UpsertScorecard
 )

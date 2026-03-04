@@ -43,17 +43,6 @@ import kmpscorer.shared.generated.resources.batting_side_label
 import kmpscorer.shared.generated.resources.cancel
 import kmpscorer.shared.generated.resources.date_label
 import kmpscorer.shared.generated.resources.duration_label
-import kmpscorer.shared.generated.resources.invalid_batting_side_name
-import kmpscorer.shared.generated.resources.invalid_team_winning_toss_name
-import kmpscorer.shared.generated.resources.missing_date
-import kmpscorer.shared.generated.resources.missing_duration
-import kmpscorer.shared.generated.resources.missing_match_title
-import kmpscorer.shared.generated.resources.missing_opponents_name
-import kmpscorer.shared.generated.resources.missing_scorer
-import kmpscorer.shared.generated.resources.missing_start_time
-import kmpscorer.shared.generated.resources.missing_team_name
-import kmpscorer.shared.generated.resources.missing_type_of_match
-import kmpscorer.shared.generated.resources.missing_venue
 import kmpscorer.shared.generated.resources.opponents_label
 import kmpscorer.shared.generated.resources.pitch_conditions_label
 import kmpscorer.shared.generated.resources.referee_label
@@ -72,6 +61,7 @@ import kmpscorer.shared.generated.resources.umpire2_label
 import kmpscorer.shared.generated.resources.unable_to_save_scorecard
 import kmpscorer.shared.generated.resources.venue_label
 import kmpscorer.shared.generated.resources.weather_label
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -86,30 +76,35 @@ fun AddEditScorecardScreenRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
 
     AddEditScorecardScreen(
-        state = state,
         useCases = viewModel.addEditScorecardUseCases,
+        state = state,
+        emittedScorecardEvents = viewModel.addEditScoorecardEvent,
+        onUiEvent = viewModel::onEvent,
+        onSaveOrCancel = onSaveOrCancel,
         isExpandedScreen = isExpandedScreen,
-        onSaveOrCancel = onSaveOrCancel
+        isValid = viewModel.isValid
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditScorecardScreen(
-    state: AddEditScorecardState,
     useCases: AddEditScorecardUseCases,
-    isExpandedScreen: Boolean = false,
+    state: AddEditScorecardState,
+    emittedScorecardEvents: SharedFlow<AddEditScorecardEvent>,
+    onUiEvent: (AddEditScorecardUiEvent) -> Unit,
     onSaveOrCancel: () -> Unit,
+    isExpandedScreen: Boolean = false,
+    isValid: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
 
     val snackbarHostState = remember { SnackbarHostState() }
     val savedMessage = stringResource(Res.string.saved_scorecard)
     val unableToSaveScorecardMessage = stringResource(Res.string.unable_to_save_scorecard)
-    val viewModel = AddEditScorecardViewModel(null, useCases)
 
     LaunchedEffect(true) {
-        viewModel.eventFlow.collectLatest { event ->
+        emittedScorecardEvents.collectLatest { event ->
             when (event) {
                 AddEditScorecardEvent.SavedScorecard -> {
                     snackbarHostState.showSnackbar(message = savedMessage)
@@ -150,13 +145,13 @@ fun AddEditScorecardScreen(
                         useCases = useCases,
                         state = state,
                         modifier = modifier,
-                        viewModel = viewModel
+                        onEvent = onUiEvent
                     )
                 } else {
                     TwoColumnDisplay(
                         useCases = useCases,
                         state = state,
-                        viewModel = viewModel
+                        onEvent = onUiEvent
                     )
                 }
             }
@@ -172,8 +167,8 @@ fun AddEditScorecardScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.SaveScorecard)
-                }, enabled = viewModel.isValid) {
+                    onUiEvent(AddEditScorecardUiEvent.SaveScorecard)
+                }, enabled = isValid) {
                     Text(text = stringResource(Res.string.save))
                 }
 
@@ -192,9 +187,8 @@ fun TwoColumnDisplay(
     modifier: Modifier = Modifier,
     state: AddEditScorecardState,
     useCases: AddEditScorecardUseCases,
-    viewModel: AddEditScorecardViewModel
+    onEvent: (event: AddEditScorecardUiEvent) -> Unit
 ) {
-    val scorecard = viewModel.state.value
     val scrollState = rememberScrollState()
 
     Column(
@@ -214,19 +208,16 @@ fun TwoColumnDisplay(
         ) {
 
 
+            var result = useCases.validateTeamName(state.teamName)
             AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.teamName,
+                modifier = Modifier.fillMaxWidth(),
+                value = state.teamName,
                 labelId = Res.string.team_label,
-                isError = viewModel.isEmpty(
-                    viewModel.state.value.teamName,
-                    viewModel.state.value.teamNameChanged
-                ),
-                errorMessageId = Res.string.missing_team_name,
+                isError = result.error && state.teamNameChanged,
+                errorMessage = result.errorMessage,
                 onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredTeamName(it))
-                },
-            )
+                    onEvent(AddEditScorecardUiEvent.EnteredTeamName(it))
+                })
 
             Box(
                 modifier = Modifier
@@ -240,17 +231,15 @@ fun TwoColumnDisplay(
                 )
             }
 
+            result = useCases.validateTeamName(state.opponentsName)
             AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.opponentsName,
+                modifier = Modifier.fillMaxWidth(),
+                value = state.opponentsName,
                 labelId = Res.string.opponents_label,
-                isError = viewModel.isEmpty(
-                    viewModel.state.value.opponentsName,
-                    viewModel.state.value.opponentsNameChanged
-                ),
-                errorMessageId = Res.string.missing_opponents_name,
+                isError = result.error && state.opponentsNameChanged,
+                errorMessage = result.errorMessage,
                 onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredOpponentsName(it))
+                    onEvent(AddEditScorecardUiEvent.EnteredOpponentsName(it))
                 },
             )
         }
@@ -258,227 +247,213 @@ fun TwoColumnDisplay(
 
         Row(modifier = Modifier.fillMaxWidth()) {
 
+            var result = useCases.validateVenue(state.venue)
             AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.venue,
+                modifier = Modifier.fillMaxWidth(),
+                value = state.venue,
                 labelId = Res.string.venue_label,
-                isError = viewModel.isEmpty(
-                    viewModel.state.value.venue,
-                    viewModel.state.value.venueChanged
-                ),
-                errorMessageId = Res.string.missing_venue,
+                isError = result.error && state.venueChanged,
+                errorMessage = result.errorMessage,
                 onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredVenue(it))
+                    onEvent(AddEditScorecardUiEvent.EnteredVenue(it))
                 },
             )
             Spacer(modifier = Modifier.width(24.dp))
 
+            result = useCases.validateTitle(state.title)
             AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.title,
+                modifier = Modifier.fillMaxWidth(),
+                value = state.title,
                 labelId = Res.string.title_label,
-                isError = viewModel.isEmpty(
-                    viewModel.state.value.title,
-                    viewModel.state.value.titleChanged
-                ),
-                errorMessageId = Res.string.missing_match_title,
+                isError = result.error && state.titleChanged,
+                errorMessage = result.errorMessage,
                 onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredTitle(it))
+                    onEvent(AddEditScorecardUiEvent.EnteredTitle(it))
                 },
             )
         }
         Spacer(modifier = Modifier.height(4.dp))
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.matchDate,
-                labelId = Res.string.date_label,
-                isError = viewModel.isEmpty(
-                    viewModel.state.value.matchDate,
-                    viewModel.state.value.matchDateChanged
-                ),
-                errorMessageId = Res.string.missing_date,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredDate(it))
-                },
-            )
-            Spacer(modifier = Modifier.width(24.dp))
+        var result = useCases.validateMatchDate(state.matchDate)
+        AddEditScorecardScreenField(
+            modifier = Modifier.fillMaxWidth(),
+            value = state.matchDate,
+            labelId = Res.string.date_label,
+            isError = result.error && state.matchDateChanged,
+            errorMessage = result.errorMessage,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredDate(it))
+            },
+        )
+        Spacer(modifier = Modifier.width(24.dp))
 
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.battingSide,
-                labelId = Res.string.batting_side_label,
-                isError = viewModel.isEmpty(
-                    viewModel.state.value.battingSide,
-                    viewModel.state.value.battingSideChanged
-                ) || !(viewModel.state.value.battingSide == viewModel.state.value.teamName
-                        || viewModel.state.value.battingSide == viewModel.state.value.opponentsName),
-                errorMessageId = Res.string.invalid_batting_side_name,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredBattingSide(it))
-                },
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
+        result = useCases.validateBattingSide(
+            state.battingSide,
+            teamName = state.teamName,
+            opponentsName = state.opponentsName
+        )
+        AddEditScorecardScreenField(
+            modifier = Modifier.fillMaxWidth(),
+            value = state.battingSide,
+            labelId = Res.string.batting_side_label,
+            isError = result.error && state.battingSideChanged,
+            errorMessage = result.errorMessage,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredBattingSide(it))
+            },
+        )
+    }
+    Spacer(modifier = Modifier.height(4.dp))
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.umpire1Name ?: "",
-                labelId = Res.string.umpire1_label,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredUmpire1Name(it))
-                },
-            )
-            Spacer(modifier = Modifier.width(24.dp))
+    Row(modifier = Modifier.fillMaxWidth()) {
+        AddEditScorecardScreenField(
+            modifier = Modifier.weight(0.5f),
+            value = state.umpire1Name ?: "",
+            labelId = Res.string.umpire1_label,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredUmpire1Name(it))
+            },
+        )
+        Spacer(modifier = Modifier.width(24.dp))
 
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.umpire2Name ?: "",
-                labelId = Res.string.umpire2_label,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredUmpire2Name(it))
-                },
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
+        AddEditScorecardScreenField(
+            modifier = Modifier.weight(0.5f),
+            value = state.umpire2Name ?: "",
+            labelId = Res.string.umpire2_label,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredUmpire2Name(it))
+            },
+        )
+    }
+    Spacer(modifier = Modifier.height(4.dp))
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.thirdUmpireName ?: "",
-                labelId = Res.string.third_umpire_label,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredThirdUmpireName(it))
-                },
-            )
-            Spacer(modifier = Modifier.width(24.dp))
+    Row(modifier = Modifier.fillMaxWidth()) {
+        AddEditScorecardScreenField(
+            modifier = Modifier.weight(0.5f),
+            value = state.thirdUmpireName ?: "",
+            labelId = Res.string.third_umpire_label,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredThirdUmpireName(it))
+            },
+        )
+        Spacer(modifier = Modifier.width(24.dp))
 
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.refereeName ?: "",
-                labelId = Res.string.referee_label,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredReferee(it))
-                },
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
+        AddEditScorecardScreenField(
+            modifier = Modifier.weight(0.5f),
+            value = state.refereeName ?: "",
+            labelId = Res.string.referee_label,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredReferee(it))
+            },
+        )
+    }
+    Spacer(modifier = Modifier.height(4.dp))
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.scorer1Name,
-                labelId = Res.string.scorer1_label,
-                isError = viewModel.isEmpty(
-                    "viewModel.scorecard.value.scorer1Name",
-                    viewModel.state.value.scorer1NameChanged
-                ),
-                errorMessageId = Res.string.missing_scorer,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredScorer1Name(it))
-                },
-            )
-            Spacer(modifier = Modifier.width(24.dp))
+    Row(modifier = Modifier.fillMaxWidth()) {
+        val result = useCases.validateScorer(state.scorer1Name)
+        AddEditScorecardScreenField(
+            modifier = Modifier.fillMaxWidth(),
+            value = state.scorer1Name,
+            labelId = Res.string.scorer1_label,
+            isError = result.error && state.scorer1NameChanged,
+            errorMessage = result.errorMessage,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredScorer1Name(it))
+            },
+        )
+        Spacer(modifier = Modifier.width(24.dp))
 
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.scorer2Name ?: "",
-                labelId = Res.string.scorer2_label,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredScorer2Name(it))
-                },
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
+        AddEditScorecardScreenField(
+            modifier = Modifier.weight(0.5f),
+            value = state.scorer2Name ?: "",
+            labelId = Res.string.scorer2_label,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredScorer2Name(it))
+            },
+        )
+    }
+    Spacer(modifier = Modifier.height(4.dp))
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.typeOfMatch,
-                labelId = Res.string.type_of_match_label,
-                isError = viewModel.isEmpty(
-                    "viewModel.scorecard.value.typeOfMatch",
-                    viewModel.state.value.typeOfMatchChanged
-                ),
-                errorMessageId = Res.string.missing_type_of_match,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredTypeOfMatch(it))
-                },
-            )
-            Spacer(modifier = Modifier.width(24.dp))
+    Row(modifier = Modifier.fillMaxWidth()) {
+        var result = useCases.validateMatchLabel(state.typeOfMatch)
+        AddEditScorecardScreenField(
+            modifier = Modifier.fillMaxWidth(),
+            value = state.typeOfMatch,
+            labelId = Res.string.type_of_match_label,
+            isError = result.error && state.typeOfMatchChanged,
+            errorMessage = result.errorMessage,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredTypeOfMatch(it))
+            },
+        )
+        Spacer(modifier = Modifier.width(24.dp))
 
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.duration,
-                labelId = Res.string.duration_label,
-                isError = viewModel.isEmpty(
-                    "viewModel.scorecard.value.duration",
-                    viewModel.state.value.durationChanged
-                ),
-                errorMessageId = Res.string.missing_duration,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredDuration(it))
-                },
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
+        result = useCases.validateDuration(state.duration)
+        AddEditScorecardScreenField(
+            modifier = Modifier.fillMaxWidth(),
+            value = state.duration,
+            labelId = Res.string.duration_label,
+            isError = result.error && state.durationChanged,
+            errorMessage = result.errorMessage,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredDuration(it))
+            },
+        )
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.startTime,
-                labelId = Res.string.start_time_label,
-                isError = viewModel.isEmpty(
-                    viewModel.state.value.startTime,
-                    viewModel.state.value.startTimeChanged
-                ),
-                errorMessageId = Res.string.missing_start_time,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredStartTime(it))
-                },
-            )
-            Spacer(modifier = Modifier.width(24.dp))
+    }
+    Spacer(modifier = Modifier.height(4.dp))
 
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.teamWinningToss,
-                labelId = Res.string.team_winning_toss_label,
-                isError = viewModel.isEmpty(
-                    viewModel.state.value.teamWinningToss,
-                    viewModel.state.value.teamWinningTossChanged
-                ) || !(viewModel.state.value.teamWinningToss == viewModel.state.value.teamName
-                        || viewModel.state.value.teamWinningToss == viewModel.state.value.opponentsName),
-                errorMessageId = Res.string.invalid_team_winning_toss_name,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredTeamWinningToss(it))
-                },
-            )
-        }
-        Spacer(modifier = Modifier.height(4.dp))
+    Row(modifier = Modifier.fillMaxWidth()) {
+        var result = useCases.validateStartTime(state.startTime)
+        AddEditScorecardScreenField(
+            modifier = Modifier.fillMaxWidth(),
+            value = state.startTime,
+            labelId = Res.string.start_time_label,
+            isError = result.error && state.startTimeChanged,
+            errorMessage = result.errorMessage,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredStartTime(it))
+            },
+        )
+        Spacer(modifier = Modifier.width(24.dp))
 
-        Row(modifier = Modifier.fillMaxWidth()) {
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.weather ?: "",
-                labelId = Res.string.weather_label,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredWeather(it))
-                },
-            )
-            Spacer(modifier = Modifier.width(24.dp))
+        result = useCases.validateTeamWinningToss(
+            state.teamWinningToss,
+            state.teamName,
+            state.opponentsName
+        )
+        AddEditScorecardScreenField(
+            modifier = Modifier.fillMaxWidth(),
+            value = state.teamWinningToss,
+            labelId = Res.string.team_winning_toss_label,
+            isError = result.error && state.teamWinningTossChanged,
+            errorMessage = result.errorMessage,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredTeamWinningToss(it))
+            },
+        )
+    }
+    Spacer(modifier = Modifier.height(4.dp))
 
-            AddEditScorecardScreenField(
-                modifier = Modifier.weight(0.5f),
-                value = scorecard.pitchCondition ?: "",
-                labelId = Res.string.pitch_conditions_label,
-                onValueChange = {
-                    viewModel.onEvent(AddEditScorecardUiEvent.EnteredPitchCondition(it))
-                },
-            )
-        }
+    Row(modifier = Modifier.fillMaxWidth()) {
+        AddEditScorecardScreenField(
+            modifier = Modifier.weight(0.5f),
+            value = state.weather ?: "",
+            labelId = Res.string.weather_label,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredWeather(it))
+            },
+        )
+        Spacer(modifier = Modifier.width(24.dp))
 
+        AddEditScorecardScreenField(
+            modifier = Modifier.weight(0.5f),
+            value = state.pitchCondition ?: "",
+            labelId = Res.string.pitch_conditions_label,
+            onValueChange = {
+                onEvent(AddEditScorecardUiEvent.EnteredPitchCondition(it))
+            },
+        )
     }
 }
 
@@ -488,9 +463,9 @@ private fun SingleColumnDisplay(
     modifier: Modifier = Modifier,
     state: AddEditScorecardState,
     useCases: AddEditScorecardUseCases,
-    viewModel: AddEditScorecardViewModel
+    onEvent: (event: AddEditScorecardUiEvent) -> Unit
 ) {
-    val scorecard = viewModel.state.value
+
     val scrollState = rememberScrollState()
 
     Column(
@@ -506,26 +481,24 @@ private fun SingleColumnDisplay(
         var result = useCases.validateTeamName(state.teamName)
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.teamName,
+            value = state.teamName,
             labelId = Res.string.team_label,
-            isError = result.successful,
+            isError = result.error && state.teamNameChanged,
             errorMessage = result.errorMessage,
-            errorMessageId = Res.string.missing_team_name,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredTeamName(it))
+                onEvent(AddEditScorecardUiEvent.EnteredTeamName(it))
             })
         Spacer(modifier = Modifier.height(4.dp))
 
         result = useCases.validateTeamName(state.opponentsName)
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.opponentsName,
+            value = state.opponentsName,
             labelId = Res.string.opponents_label,
-            isError = result.successful,
+            isError = result.error && state.opponentsNameChanged,
             errorMessage = result.errorMessage,
-            errorMessageId = Res.string.missing_opponents_name,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredOpponentsName(it))
+                onEvent(AddEditScorecardUiEvent.EnteredOpponentsName(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -533,13 +506,12 @@ private fun SingleColumnDisplay(
         result = useCases.validateVenue(state.venue)
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.venue,
+            value = state.venue,
             labelId = Res.string.venue_label,
-            isError = result.successful,
+            isError = result.error && state.venueChanged,
             errorMessage = result.errorMessage,
-            errorMessageId = Res.string.missing_venue,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredVenue(it))
+                onEvent(AddEditScorecardUiEvent.EnteredVenue(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -547,13 +519,12 @@ private fun SingleColumnDisplay(
         result = useCases.validateTitle(state.title)
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.title,
+            value = state.title,
             labelId = Res.string.title_label,
-            isError = result.successful,
+            isError = result.error  && state.titleChanged,
             errorMessage = result.errorMessage,
-            errorMessageId = Res.string.missing_match_title,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredTitle(it))
+                onEvent(AddEditScorecardUiEvent.EnteredTitle(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -561,67 +532,69 @@ private fun SingleColumnDisplay(
         result = useCases.validateMatchDate(state.matchDate)
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.matchDate,
+            value = state.matchDate,
             labelId = Res.string.date_label,
-            isError = result.successful,
+            isError = result.error && state.matchDateChanged,
             errorMessage = result.errorMessage,
-            errorMessageId = Res.string.missing_date,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredDate(it))
+                onEvent(AddEditScorecardUiEvent.EnteredDate(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
 
-        result = useCases.validateBattingSide(state.battingSide, teamName = state.teamName, opponentsName = state.opponentsName)
+        result = useCases.validateBattingSide(
+            state.battingSide,
+            teamName = state.teamName,
+            opponentsName = state.opponentsName
+        )
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.battingSide,
+            value = state.battingSide,
             labelId = Res.string.batting_side_label,
-            isError = result.successful,
+            isError = result.error && state.battingSideChanged,
             errorMessage = result.errorMessage,
-            errorMessageId = Res.string.invalid_batting_side_name,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredBattingSide(it))
+                onEvent(AddEditScorecardUiEvent.EnteredBattingSide(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
 
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.umpire1Name ?: "",
+            value = state.umpire1Name ?: "",
             labelId = Res.string.umpire1_label,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredUmpire1Name(it))
+                onEvent(AddEditScorecardUiEvent.EnteredUmpire1Name(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
 
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.umpire2Name ?: "",
+            value = state.umpire2Name ?: "",
             labelId = Res.string.umpire2_label,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredUmpire2Name(it))
+                onEvent(AddEditScorecardUiEvent.EnteredUmpire2Name(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
 
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.thirdUmpireName ?: "",
+            value = state.thirdUmpireName ?: "",
             labelId = Res.string.third_umpire_label,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredThirdUmpireName(it))
+                onEvent(AddEditScorecardUiEvent.EnteredThirdUmpireName(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
 
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.refereeName ?: "",
+            value = state.refereeName ?: "",
             labelId = Res.string.referee_label,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredReferee(it))
+                onEvent(AddEditScorecardUiEvent.EnteredReferee(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -629,23 +602,22 @@ private fun SingleColumnDisplay(
         result = useCases.validateScorer(state.scorer1Name)
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.scorer1Name,
+            value = state.scorer1Name,
             labelId = Res.string.scorer1_label,
-            isError = result.successful,
+            isError = result.error  && state.scorer1NameChanged,
             errorMessage = result.errorMessage,
-            errorMessageId = Res.string.missing_scorer,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredScorer1Name(it))
+                onEvent(AddEditScorecardUiEvent.EnteredScorer1Name(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
 
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.scorer2Name ?: "",
+            value = state.scorer2Name ?: "",
             labelId = Res.string.scorer2_label,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredScorer2Name(it))
+                onEvent(AddEditScorecardUiEvent.EnteredScorer2Name(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -653,13 +625,12 @@ private fun SingleColumnDisplay(
         result = useCases.validateMatchLabel(state.typeOfMatch)
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.typeOfMatch,
+            value = state.typeOfMatch,
             labelId = Res.string.type_of_match_label,
-            isError = result.successful,
+            isError = result.error && state.typeOfMatchChanged,
             errorMessage = result.errorMessage,
-            errorMessageId = Res.string.missing_type_of_match,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredTypeOfMatch(it))
+                onEvent(AddEditScorecardUiEvent.EnteredTypeOfMatch(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -667,13 +638,12 @@ private fun SingleColumnDisplay(
         result = useCases.validateDuration(state.duration)
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.duration,
+            value = state.duration,
             labelId = Res.string.duration_label,
-            isError = result.successful,
+            isError = result.error && state.durationChanged,
             errorMessage = result.errorMessage,
-            errorMessageId = Res.string.missing_duration,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredDuration(it))
+                onEvent(AddEditScorecardUiEvent.EnteredDuration(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -681,47 +651,49 @@ private fun SingleColumnDisplay(
         result = useCases.validateStartTime(state.startTime)
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.startTime,
+            value = state.startTime,
             labelId = Res.string.start_time_label,
-            isError = result.successful,
+            isError = result.error && state.startTimeChanged,
             errorMessage = result.errorMessage,
-            errorMessageId = Res.string.missing_start_time,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredStartTime(it))
+                onEvent(AddEditScorecardUiEvent.EnteredStartTime(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
 
-        result = useCases.validateTeamWinningToss(state.teamWinningToss, state.teamName, state.opponentsName)
+        result = useCases.validateTeamWinningToss(
+            state.teamWinningToss,
+            state.teamName,
+            state.opponentsName
+        )
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.teamWinningToss,
+            value = state.teamWinningToss,
             labelId = Res.string.team_winning_toss_label,
-            isError = result.successful,
+            isError = result.error,
             errorMessage = result.errorMessage,
-            errorMessageId = Res.string.invalid_team_winning_toss_name,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredTeamWinningToss(it))
+                onEvent(AddEditScorecardUiEvent.EnteredTeamWinningToss(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
 
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.weather ?: "",
+            value = state.weather ?: "",
             labelId = Res.string.weather_label,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredWeather(it))
+                onEvent(AddEditScorecardUiEvent.EnteredWeather(it))
             },
         )
         Spacer(modifier = Modifier.height(4.dp))
 
         AddEditScorecardScreenField(
             modifier = Modifier.fillMaxWidth(),
-            value = scorecard.pitchCondition ?: "",
+            value = state.pitchCondition ?: "",
             labelId = Res.string.pitch_conditions_label,
             onValueChange = {
-                viewModel.onEvent(AddEditScorecardUiEvent.EnteredPitchCondition(it))
+                onEvent(AddEditScorecardUiEvent.EnteredPitchCondition(it))
             },
         )
     }
@@ -733,7 +705,6 @@ fun AddEditScorecardScreenField(
     value: String,
     labelId: StringResource,
     isError: Boolean = false,
-    errorMessageId: StringResource? = null,
     onValueChange: (String) -> Unit,
     errorMessage: UiText? = null
 ) {
@@ -751,9 +722,9 @@ fun AddEditScorecardScreenField(
             isError = isError,
             singleLine = true
         )
-        if (isError && errorMessageId != null) {
+        if (isError && errorMessage != null) {
             Text(
-                text = errorMessage?.asString() ?: stringResource(errorMessageId),
+                text = errorMessage.asString(),
                 color = MaterialTheme.colorScheme.error,
                 fontSize = 16.sp
             )

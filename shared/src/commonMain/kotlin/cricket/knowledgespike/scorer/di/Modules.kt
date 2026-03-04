@@ -2,6 +2,7 @@ package cricket.knowledgespike.scorer.di
 
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.AddEditScorecardUseCases
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.UpsertScorecard
+import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.ValidateBattingSide
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.ValidateDuration
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.ValidateMatchDate
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.ValidateMatchLabel
@@ -32,7 +33,8 @@ val sharedModule = module {
     singleOf(::ValidateStartTime)
     singleOf(::ValidateTeamWinningToss)
     singleOf(::ValidateMatchDate)
-    singleOf(::UpsertScorecard)
+    singleOf(::ValidateBattingSide)
+//    singleOf(::UpsertScorecard)
     singleOf(::AddEditScorecardUseCases)
     viewModelOf(::AddEditScorecardViewModel)
     viewModelOf(::ScorecardListVewModel)
