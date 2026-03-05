@@ -3,6 +3,8 @@ package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.presenta
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
 
 data class AddEditScorecardState(
+    val id: Int?,
+
     val teamName: String = "",
     val teamNameChanged: Boolean = false,
 
@@ -49,6 +51,7 @@ data class AddEditScorecardState(
 
 fun AddEditScorecardState.toScorecardHeaderDetails(): ScorecardHeaderDetails {
     return ScorecardHeaderDetails(
+        id = id,
         teamName = teamName,
         opponentsName = opponentsName,
         venue = venue,
@@ -72,6 +75,7 @@ fun AddEditScorecardState.toScorecardHeaderDetails(): ScorecardHeaderDetails {
 
 fun ScorecardHeaderDetails.toScoreCardFullDetails(): AddEditScorecardState {
     return AddEditScorecardState(
+        id = id,
         teamName = teamName,
         opponentsName = opponentsName,
         venue = venue,

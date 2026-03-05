@@ -4,7 +4,6 @@ import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.data.repo
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.repository.AddEditScorecardRepository
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.presentation.AddEditScorecardViewModel
 import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.usecase.GetScorecardUseCase
-import cricket.knowledgespike.scorer.feature.find.scorecard_list.presentation.ScorecardListVewModel
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind

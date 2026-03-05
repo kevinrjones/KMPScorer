@@ -20,7 +20,7 @@ class AddEditScorecardViewModel(
     val addEditScorecardUseCases: AddEditScorecardUseCases
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(AddEditScorecardState())
+    private val _state = MutableStateFlow(AddEditScorecardState(id = null))
     val state = _state.asStateFlow()
 
     private val _addEditScorecardEvent = MutableSharedFlow<AddEditScorecardEvent>()
@@ -36,7 +36,7 @@ class AddEditScorecardViewModel(
         viewModelScope.launch {
             if (scorecardId == null) {
                 _state.update {
-                    AddEditScorecardState()
+                    AddEditScorecardState(id = null)
                 }
             } else {
                 val scorecard: Either<ScorecardError.Local, ScorecardHeaderDetails> = addEditScorecardUseCases.findScorecard(scorecardId)
