@@ -1,6 +1,6 @@
 package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.presentation
 
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardFullDetails
+import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
 
 data class AddEditScorecardState(
     val teamName: String = "",
@@ -47,8 +47,31 @@ data class AddEditScorecardState(
     val pitchCondition: String? = ""
 )
 
-fun AddEditScorecardState.toScoreCardFullDetails(): ScorecardFullDetails {
-    return ScorecardFullDetails(
+fun AddEditScorecardState.toScorecardHeaderDetails(): ScorecardHeaderDetails {
+    return ScorecardHeaderDetails(
+        teamName = teamName,
+        opponentsName = opponentsName,
+        venue = venue,
+        title = title,
+        matchDate = matchDate,
+        battingSide = battingSide,
+        umpire1Name = umpire1Name,
+        umpire2Name = umpire2Name,
+        thirdUmpireName = thirdUmpireName,
+        refereeName = refereeName,
+        scorer1Name = scorer1Name,
+        scorer2Name = scorer2Name,
+        typeOfMatch = typeOfMatch,
+        duration = duration,
+        startTime = startTime,
+        teamWinningToss = teamWinningToss,
+        weather = weather,
+        pitchCondition = pitchCondition
+    )
+}
+
+fun ScorecardHeaderDetails.toScoreCardFullDetails(): AddEditScorecardState {
+    return AddEditScorecardState(
         teamName = teamName,
         opponentsName = opponentsName,
         venue = venue,

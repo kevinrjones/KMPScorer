@@ -1,6 +1,6 @@
 package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model
 
-data class ScorecardFullDetails(
+data class ScorecardHeaderDetails(
     val id: Int? = null,
     val teamName: String = "",
     val opponentsName: String = "",

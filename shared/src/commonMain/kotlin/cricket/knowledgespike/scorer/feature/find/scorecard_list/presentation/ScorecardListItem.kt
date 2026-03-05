@@ -22,7 +22,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.model.ScorecardIdentifyingDetails
+import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
 import cricket.knowledgespike.scorer.ui.theme.ScorerTheme
 import kmpscorer.shared.generated.resources.Res
 import kmpscorer.shared.generated.resources.edit
@@ -32,7 +32,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun ScorecardListItem(
     modifier: Modifier = Modifier,
-    scorecard: ScorecardIdentifyingDetails,
+    scorecard: ScorecardHeaderDetails,
     onEdit: (Int?) -> Unit,
     onScore: (Int?) -> Unit
 ) {
@@ -54,14 +54,14 @@ fun ScorecardListItem(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 OneLineText(
-                    text = scorecard.team,
+                    text = scorecard.teamName,
                     modifier = Modifier.weight(0.5f),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.secondary
                 )
                 Text(text = "vs", modifier = Modifier.width(24.dp))
                 OneLineText(
-                    text = scorecard.opponents,
+                    text = scorecard.opponentsName,
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier
@@ -87,7 +87,7 @@ fun ScorecardListItem(
                 Text(text = "on")
 
                 OneLineText(
-                    text = scorecard.date,
+                    text = scorecard.matchDate,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier
@@ -101,13 +101,13 @@ fun ScorecardListItem(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Button(onClick = {
-                    onEdit(-1)
+                    onEdit(scorecard.id)
                 }) {
                     Text(text = stringResource(Res.string.edit))
                 }
 
                 Button(onClick = {
-                    onScore(-1)
+                    onScore(scorecard.id)
                 }) {
                     Text(text = stringResource(Res.string.score))
                 }
@@ -141,11 +141,12 @@ fun PreviewScorecardListItem() {
     ScorerTheme {
         ScorecardListItem(
             modifier = Modifier,
-            scorecard = ScorecardIdentifyingDetails(
-                team = "India",
-                opponents = "Australia",
+            scorecard = ScorecardHeaderDetails(
+                id = 1,
+                teamName = "India",
+                opponentsName = "Australia",
                 venue = "Melbourne",
-                date = "23rd, 24th, 25th, 26th Nov 2024"
+                matchDate = "23rd, 24th, 25th, 26th Nov 2024"
             ),
             onEdit = {},
             onScore = {}

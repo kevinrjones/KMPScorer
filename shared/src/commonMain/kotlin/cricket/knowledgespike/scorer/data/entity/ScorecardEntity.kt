@@ -2,7 +2,7 @@ package cricket.knowledgespike.scorer.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardFullDetails
+import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
 
 @Entity(tableName = "Scorecards")
 data class ScorecardEntity(
@@ -13,21 +13,21 @@ data class ScorecardEntity(
     val title: String,
     val matchDate: String,
     val battingSide: String,
-    val umpire1Name: String?,
-    val umpire2Name: String?,
-    val thirdUmpireName: String?,
-    val refereeName: String?,
+    val umpire1Name: String? = null,
+    val umpire2Name: String? = null,
+    val thirdUmpireName: String? = null,
+    val refereeName: String? = null,
     val scorer1Name: String,
-    val scorer2Name: String?,
+    val scorer2Name: String? = null,
     val typeOfMatch: String,
     val duration: String,
     val startTime: String,
     val teamWinningToss: String,
-    val weather: String?,
-    val pitchCondition: String?
+    val weather: String? = null,
+    val pitchCondition: String? = null
 )
 
-fun ScorecardFullDetails.toEntity(): ScorecardEntity {
+fun ScorecardHeaderDetails.toEntity(): ScorecardEntity {
     return ScorecardEntity(
         id = id,
         teamName = teamName,
@@ -51,8 +51,9 @@ fun ScorecardFullDetails.toEntity(): ScorecardEntity {
     )
 
 }
-fun ScorecardEntity.toScorecardFullDetails(): ScorecardFullDetails {
-    return ScorecardFullDetails(
+
+fun ScorecardEntity.toScorecardHeaderDetails(): ScorecardHeaderDetails {
+    return ScorecardHeaderDetails(
         id = id,
         teamName = teamName,
         opponentsName = opponentsName,

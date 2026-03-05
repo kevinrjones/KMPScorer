@@ -4,46 +4,48 @@ import arrow.core.Either
 import arrow.core.left
 import com.knowledgespike.scorer.data.source.ScorecardDao
 import cricket.knowledgespike.scorer.data.entity.toEntity
-import cricket.knowledgespike.scorer.data.entity.toScorecardFullDetails
-import cricket.knowledgespike.scorer.domain.ScorecardError
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardFullDetails
+import cricket.knowledgespike.scorer.data.entity.toScorecardHeaderDetails
+import cricket.knowledgespike.scorer.domain.ScorecardError.Local
+import cricket.knowledgespike.scorer.domain.ScorecardError.Local.UnableToInsertScorecard
+import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.repository.AddEditScorecardRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 
 // todo: I hate the name Impl
 class AddEditScorecardRepositoryImpl(val dao: ScorecardDao) : AddEditScorecardRepository {
-    override fun getScorecards(): Flow<List<ScorecardFullDetails>> {
-        return dao.getScorecards().map { it.map { it.toScorecardFullDetails() } }
-    }
 
-    override suspend fun getScorecard(id: Int): Either<ScorecardError.Local, ScorecardFullDetails> {
-        dao.getScorecard(id)?.let {
-            return Either.Right(it.toScorecardFullDetails())
-        }
-        return Either.Left(ScorecardError.Local.UnableToFindScorecard(id))
-    }
-
-    override suspend fun insertScorecard(scorecardDescription: ScorecardFullDetails): Either<ScorecardError.Local.UnableToInsertScorecard, Unit> =
+    override suspend fun insertScorecard(scorecardDescription: ScorecardHeaderDetails): Either<UnableToInsertScorecard, Unit> =
         try {
             dao.upsertScorecard(scorecardDescription.toEntity())
             Either.Right(Unit)
-        } catch (_: Exception) {
-            ScorecardError.Local.UnableToInsertScorecard.left()
+        } catch (e: Exception) {
+            UnableToInsertScorecard((e.message)).left()
         }
 
-    override suspend fun updateScorecard(scorecardDescription: ScorecardFullDetails): Either<ScorecardError.Local.UnableToInsertScorecard, Unit> =
+    override suspend fun updateScorecard(scorecardDescription: ScorecardHeaderDetails): Either<UnableToInsertScorecard, Unit> =
         try {
             dao.upsertScorecard(scorecardDescription.toEntity())
             Either.Right(Unit)
-        } catch (_: Exception) {
-            ScorecardError.Local.UnableToInsertScorecard.left()
+        } catch (e: Exception) {
+            UnableToInsertScorecard(e.message).left()
         }
 
-    override suspend fun deleteScorecard(scorecardDescription: ScorecardFullDetails): Either<ScorecardError.Local.UnableToDeleteScorecard, Unit> =
-        if (dao.deleteScorecard(scorecardDescription.toEntity()) == 1) {
+    override suspend fun upsertScorecard(scorecardDescription: ScorecardHeaderDetails): Either<UnableToInsertScorecard, Unit> =
+        try {
+            dao.upsertScorecard(scorecardDescription.toEntity())
             Either.Right(Unit)
-        } else {
-            ScorecardError.Local.UnableToDeleteScorecard(scorecardDescription.id).left()
+        } catch (e: Exception) {
+            UnableToInsertScorecard(e.message).left()
         }
+
+    override suspend fun getScorecard(id: Int) =
+        try {
+            val result = dao.getScorecard(id)
+            if (result != null)
+                Either.Right(result.toScorecardHeaderDetails())
+            else
+                Local.UnableToFindScorecard(id).left()
+        } catch (e: Exception) {
+            Local.UnableToFindScorecard(id, e.message).left()
+        }
+
 }

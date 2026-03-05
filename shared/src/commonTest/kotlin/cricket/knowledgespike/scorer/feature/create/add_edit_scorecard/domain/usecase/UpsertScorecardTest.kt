@@ -2,7 +2,7 @@ package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.u
 
 import com.knowledgespike.scorer.data.source.ScorecardDao
 import cricket.knowledgespike.scorer.data.entity.ScorecardEntity
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardFullDetails
+import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -25,7 +25,7 @@ class UpsertScorecardTest {
     fun `test upsertScorecard calls dao upsert`() = runTest {
         val fakeDao = FakeScorecardDao()
         val upsertScorecard = UpsertScorecard(fakeDao)
-        val details = ScorecardFullDetails(
+        val details = ScorecardHeaderDetails(
             id = 1,
             teamName = "England",
             opponentsName = "Australia"

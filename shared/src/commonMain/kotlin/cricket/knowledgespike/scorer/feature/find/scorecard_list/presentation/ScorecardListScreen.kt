@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.model.ScorecardIdentifyingDetails
+import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
 import cricket.knowledgespike.scorer.ui.theme.ScorerTheme
 import kmpscorer.shared.generated.resources.Res
 import kmpscorer.shared.generated.resources.add_a_scorecard_descrirption
@@ -38,33 +38,12 @@ fun MatchListScreenRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    ScorecardListScreen(
-        state,
-        onAction = { action ->
-            when (action) {
-                is ScorecardListAction.onAddOrEditScorecard -> onAddOrEditScorecard(action.id)
-                is ScorecardListAction.onScore -> onScore(action.id)
-                else -> Unit
-            }
-            viewModel.onAction(action)
-        },
-        isExpandedScreen = isExpandedScreen,
-        modifier
-    )
-}
-
-@Composable
-fun ScorecardListScreen(
-    state: ScorecardListState,
-    onAction: (ScorecardListAction) -> Unit,
-    isExpandedScreen: Boolean,
-    modifier: Modifier = Modifier,
-) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                onAction(ScorecardListAction.onAddOrEditScorecard(null)) }
+                onAddOrEditScorecard(null)
+            }
             ) {
                 Icon(
                     Icons.Default.Add,
@@ -74,32 +53,56 @@ fun ScorecardListScreen(
         }
     ) { innerPadding ->
 
-        val sizeFraction = if (!isExpandedScreen) {
-            1f
-        } else {
-            0.5f
-        }
-
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.background),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize(sizeFraction),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 32.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(state.scorecards) { match ->
-                    ScorecardListItem(
-                        scorecard = match,
-                        onEdit = { id -> onAction(ScorecardListAction.onAddOrEditScorecard(id)) },
-                        onScore = { id -> onAction(ScorecardListAction.onScore(id)) }
-                    )
+        ScorecardListScreen(
+            innerPadding = innerPadding,
+            state,
+            onAction = { action ->
+                when (action) {
+                    is ScorecardListAction.onAddOrEditScorecard -> onAddOrEditScorecard(action.id)
+                    is ScorecardListAction.onScore -> onScore(action.id)
+                    else -> Unit
                 }
+                viewModel.onAction(action)
+            },
+            isExpandedScreen = isExpandedScreen,
+            modifier
+        )
+    }
+}
+
+@Composable
+fun ScorecardListScreen(
+    innerPadding: PaddingValues,
+    state: ScorecardListState,
+    onAction: (ScorecardListAction) -> Unit,
+    isExpandedScreen: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val sizeFraction = if (!isExpandedScreen) {
+        1f
+    } else {
+        0.5f
+    }
+
+    Column(
+        modifier = modifier
+            .padding(innerPadding)
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.background),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize(sizeFraction),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            items(state.scorecards) { match ->
+                ScorecardListItem(
+                    scorecard = match,
+                    onEdit = { id -> onAction(ScorecardListAction.onAddOrEditScorecard(id)) },
+                    onScore = { id -> onAction(ScorecardListAction.onScore(id)) }
+                )
             }
         }
     }
@@ -107,11 +110,12 @@ fun ScorecardListScreen(
 
 
 private val dummyScorecardIdentifyingDetails = (1..10).map {
-    ScorecardIdentifyingDetails(
-        team = "Team $it",
-        opponents = "Team ${it + 1}",
+    ScorecardHeaderDetails(
+        id = 1,
+        teamName = "Team $it",
+        opponentsName = "Team ${it + 1}",
         venue = "Melbourne",
-        date = "23rd, 24th, 25th, 26th Nov 2024"
+        matchDate = "23rd, 24th, 25th, 26th Nov 2024"
     )
 }
 
@@ -120,9 +124,10 @@ private val dummyScorecardIdentifyingDetails = (1..10).map {
 fun ScorecardListScreenPreview() {
     ScorerTheme {
         ScorecardListScreen(
+            innerPadding = PaddingValues(10.dp),
             state = ScorecardListState(scorecards = dummyScorecardIdentifyingDetails),
             onAction = {},
-            isExpandedScreen = false
+            isExpandedScreen = false,
         )
     }
 }

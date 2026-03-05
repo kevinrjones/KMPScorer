@@ -1,12 +1,11 @@
 package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase
 
-import com.knowledgespike.scorer.data.source.ScorecardDao
-import cricket.knowledgespike.scorer.data.entity.toEntity
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardFullDetails
+import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
+import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.repository.AddEditScorecardRepository
 
-class UpsertScorecard(private val dao: ScorecardDao) {
+class UpsertScorecard(private val repository: AddEditScorecardRepository) {
 
-    suspend operator fun invoke(scorecard: ScorecardFullDetails) {
-        dao.upsertScorecard(scorecard.toEntity())
+    suspend operator fun invoke(scorecard: ScorecardHeaderDetails) {
+        repository.upsertScorecard(scorecard)
     }
 }

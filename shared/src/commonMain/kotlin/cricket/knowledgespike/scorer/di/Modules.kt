@@ -18,7 +18,9 @@ import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.us
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.ValidateTeamWinningToss
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.ValidateTitle
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.ValidateVenue
+import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.addEditModule
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.presentation.AddEditScorecardViewModel
+import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.usecase.ListScorecardUseCases
 import cricket.knowledgespike.scorer.feature.find.scorecard_list.presentation.ScorecardListVewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -29,22 +31,7 @@ import org.koin.dsl.module
 expect val platformModule: Module
 
 val sharedModule = module {
-    singleOf(::ValidateTeamName)
-    singleOf(::ValidateOpponentsName)
-    singleOf(::ValidateVenue)
-    singleOf(::ValidateTitle)
-    singleOf(::ValidateScorer)
-    singleOf(::ValidateMatchLabel)
-    singleOf(::ValidateDuration)
-    singleOf(::ValidateStartTime)
-    singleOf(::ValidateTeamWinningToss)
-    singleOf(::ValidateMatchDate)
-    singleOf(::ValidateBattingSide)
-    singleOf(::UpsertScorecard)
-    singleOf(::AddEditScorecardUseCases)
 
-
-    singleOf(::AddEditScorecardRepositoryImpl).bind<AddEditScorecardRepository>()
     single {
         get<DatabaseFactory>().create()
             .setDriver(BundledSQLiteDriver())
@@ -52,6 +39,4 @@ val sharedModule = module {
     }
     single { get<ScorecardDatabase>().scorecardDao }
 
-    viewModelOf(::AddEditScorecardViewModel)
-    viewModelOf(::ScorecardListVewModel)
 }

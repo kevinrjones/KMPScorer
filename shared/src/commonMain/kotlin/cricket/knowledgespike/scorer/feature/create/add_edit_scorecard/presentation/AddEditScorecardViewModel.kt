@@ -3,6 +3,9 @@ package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.presenta
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
+import cricket.knowledgespike.scorer.domain.ScorecardError
+import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.AddEditScorecardUseCases
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,8 +23,8 @@ class AddEditScorecardViewModel(
     private val _state = MutableStateFlow(AddEditScorecardState())
     val state = _state.asStateFlow()
 
-    private val _addEditScoorecardEvent = MutableSharedFlow<AddEditScorecardEvent>()
-    val addEditScoorecardEvent = _addEditScoorecardEvent.asSharedFlow()
+    private val _addEditScorecardEvent = MutableSharedFlow<AddEditScorecardEvent>()
+    val addEditScorecardEvent = _addEditScorecardEvent.asSharedFlow()
 
 
     init {
@@ -30,6 +33,22 @@ class AddEditScorecardViewModel(
     }
 
     private fun findScorecard(scorecardId: Int?) {
+        viewModelScope.launch {
+            if (scorecardId == null) {
+                _state.update {
+                    AddEditScorecardState()
+                }
+            } else {
+                val scorecard: Either<ScorecardError.Local, ScorecardHeaderDetails> = addEditScorecardUseCases.findScorecard(scorecardId)
+                scorecard.map { scorecardHeaderDetails ->
+                    _state.update { scorecardHeaderDetails.toScoreCardFullDetails() }
+                }
+                scorecard.mapLeft {
+                    // todo: log
+                    _addEditScorecardEvent.emit(AddEditScorecardEvent.ErrorSavingScorecard)
+                }
+            }
+        }
     }
 
     val isValid: Boolean
@@ -42,10 +61,10 @@ class AddEditScorecardViewModel(
             AddEditScorecardUiEvent.SaveScorecard -> {
                 viewModelScope.launch {
                     if (isScorecardValid()) {
-                        addEditScorecardUseCases.upsertScorecard(scorecard = state.value.toScoreCardFullDetails())
-                        _addEditScoorecardEvent.emit(AddEditScorecardEvent.SavedScorecard)
+                        addEditScorecardUseCases.upsertScorecard(scorecard = state.value.toScorecardHeaderDetails())
+                        _addEditScorecardEvent.emit(AddEditScorecardEvent.SavedScorecard)
                     } else {
-                        _addEditScoorecardEvent.emit(AddEditScorecardEvent.ErrorSavingScorecard)
+                        _addEditScorecardEvent.emit(AddEditScorecardEvent.ErrorSavingScorecard)
                     }
                 }
             }
@@ -138,10 +157,14 @@ class AddEditScorecardViewModel(
     private fun isScorecardValid(): Boolean {
         return addEditScorecardUseCases.validateTeamName(state.value.teamName).successful
                 && addEditScorecardUseCases.validateTeamName(state.value.opponentsName).successful
-    }
-
-    fun isEmpty(value: String, changed: Boolean): Boolean {
-        return value.isBlank() && changed
+                && addEditScorecardUseCases.validateScorer(state.value.scorer1Name).successful
+                && addEditScorecardUseCases.validateTitle(state.value.title).successful
+                && addEditScorecardUseCases.validateVenue(state.value.venue).successful
+                && addEditScorecardUseCases.validateDuration(state.value.duration).successful
+                && addEditScorecardUseCases.validateBattingSide(state.value.battingSide, state.value.teamName, state.value.opponentsName).successful
+                && addEditScorecardUseCases.validateTeamWinningToss(state.value.battingSide, state.value.teamName, state.value.opponentsName).successful
+                && addEditScorecardUseCases.validateMatchLabel(state.value.typeOfMatch).successful
+                && addEditScorecardUseCases.validateStartTime(state.value.startTime).successful
     }
 }
 

@@ -81,7 +81,7 @@ fun AddEditScorecardScreenRoot(
     val unableToSaveScorecardMessage = stringResource(Res.string.unable_to_save_scorecard)
 
     LaunchedEffect(true) {
-        viewModel.addEditScoorecardEvent.collectLatest { event ->
+        viewModel.addEditScorecardEvent.collectLatest { event ->
             when (event) {
                 AddEditScorecardEvent.SavedScorecard -> {
                     snackbarHostState.showSnackbar(message = savedMessage)
