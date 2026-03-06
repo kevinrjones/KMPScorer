@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ScorecardDao {
-    @Query("SELECT * FROM Scorecards")
+    @Query("SELECT * FROM Scorecards where not deleted")
     fun getScorecards() : Flow<List<ScorecardEntity>>
 
     @Query("SELECT * FROM Scorecards WHERE id = :id")

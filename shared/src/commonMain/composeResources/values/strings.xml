@@ -3,6 +3,7 @@
     <string name="app_name">scorer</string>
     <string name="save">Save</string>
     <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
     <string name="score">Score</string>
     <string name="add_a_scorecard_descrirption">Add a scorecard</string>
@@ -25,6 +26,8 @@
     <string name="weather_label">Weather</string>
     <string name="pitch_conditions_label">Pitch conditions</string>
     <string name="saved_scorecard">Scorecard saved</string>
+    <string name="deleting_scorecard">Deleting scorecard</string>
+    <string name="deleted_scorecard">Scorecard deleted</string>
     <string name="unable_to_save_scorecard">Unable to save scorecard</string>
     <string name="missing_team_name">You must provide the team name</string>
     <string name="missing_opponents_name">You must provide the opponents name</string>
@@ -37,6 +40,7 @@
     <string name="missing_start_time">You must provide the start time</string>
     <string name="invalid_batting_side_name">You must provide the batting side and it must be the same as either team or opponents</string>
     <string name="invalid_team_winning_toss_name">You must provide the name of the team winning the toss and it must be the same as either team or opponents</string>
+    <string name="no_scorecards_saved">You have no saved scorecards.</string>"
     <string name="time_label">Time</string>"
     <string name="over_label">Overs</string>"
     <string name="bowlers_label">Bowlers</string>"

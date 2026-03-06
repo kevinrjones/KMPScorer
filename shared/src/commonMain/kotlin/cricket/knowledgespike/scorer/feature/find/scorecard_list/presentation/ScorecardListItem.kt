@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
 import cricket.knowledgespike.scorer.ui.theme.ScorerTheme
 import kmpscorer.shared.generated.resources.Res
+import kmpscorer.shared.generated.resources.delete
 import kmpscorer.shared.generated.resources.edit
 import kmpscorer.shared.generated.resources.score
 import org.jetbrains.compose.resources.stringResource
@@ -34,6 +35,7 @@ fun ScorecardListItem(
     modifier: Modifier = Modifier,
     scorecard: ScorecardHeaderDetails,
     onEdit: (Int?) -> Unit,
+    onDelete: (ScorecardHeaderDetails) -> Unit,
     onScore: (Int?) -> Unit
 ) {
     Card(
@@ -107,6 +109,12 @@ fun ScorecardListItem(
                 }
 
                 Button(onClick = {
+                    onDelete(scorecard)
+                }) {
+                    Text(text = stringResource(Res.string.delete))
+                }
+
+                Button(onClick = {
                     onScore(scorecard.id)
                 }) {
                     Text(text = stringResource(Res.string.score))
@@ -149,6 +157,7 @@ fun PreviewScorecardListItem() {
                 matchDate = "23rd, 24th, 25th, 26th Nov 2024"
             ),
             onEdit = {},
+            onDelete = {},
             onScore = {}
         )
     }

@@ -1,0 +1,138 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "2a7dc0b40c18fda7d2bd6fbce0a71d00",
+    "entities": [
+      {
+        "tableName": "Scorecards",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `teamName` TEXT NOT NULL, `opponentsName` TEXT NOT NULL, `venue` TEXT NOT NULL, `title` TEXT NOT NULL, `matchDate` TEXT NOT NULL, `battingSide` TEXT NOT NULL, `umpire1Name` TEXT, `umpire2Name` TEXT, `thirdUmpireName` TEXT, `refereeName` TEXT, `scorer1Name` TEXT NOT NULL, `scorer2Name` TEXT, `typeOfMatch` TEXT NOT NULL, `duration` TEXT NOT NULL, `startTime` TEXT NOT NULL, `teamWinningToss` TEXT NOT NULL, `weather` TEXT, `pitchCondition` TEXT, `dateSaved` INTEGER NOT NULL DEFAULT 0)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "teamName",
+            "columnName": "teamName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "opponentsName",
+            "columnName": "opponentsName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "venue",
+            "columnName": "venue",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "matchDate",
+            "columnName": "matchDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "battingSide",
+            "columnName": "battingSide",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "umpire1Name",
+            "columnName": "umpire1Name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "umpire2Name",
+            "columnName": "umpire2Name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "thirdUmpireName",
+            "columnName": "thirdUmpireName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "refereeName",
+            "columnName": "refereeName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "scorer1Name",
+            "columnName": "scorer1Name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scorer2Name",
+            "columnName": "scorer2Name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "typeOfMatch",
+            "columnName": "typeOfMatch",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startTime",
+            "columnName": "startTime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "teamWinningToss",
+            "columnName": "teamWinningToss",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "weather",
+            "columnName": "weather",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "pitchCondition",
+            "columnName": "pitchCondition",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "dateSaved",
+            "columnName": "dateSaved",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2a7dc0b40c18fda7d2bd6fbce0a71d00')"
+    ]
+  }
+}

@@ -1,5 +1,6 @@
 package cricket.knowledgespike.scorer.foundation
 
+import cricket.knowledgespike.scorer.foundation.compose.UiText
 import org.jetbrains.compose.resources.StringResource
 
 data class ValidationResult(

@@ -1,8 +1,11 @@
 package cricket.knowledgespike.scorer.data.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 @Entity(tableName = "Scorecards")
 data class ScorecardEntity(
@@ -24,7 +27,11 @@ data class ScorecardEntity(
     val startTime: String,
     val teamWinningToss: String,
     val weather: String? = null,
-    val pitchCondition: String? = null
+    val pitchCondition: String? = null,
+    @ColumnInfo(defaultValue = "0")
+    val dateSaved: Instant = Clock.System.now(),
+    @ColumnInfo(defaultValue = "0")
+    val deleted: Boolean
 )
 
 fun ScorecardHeaderDetails.toEntity(): ScorecardEntity {
@@ -47,7 +54,9 @@ fun ScorecardHeaderDetails.toEntity(): ScorecardEntity {
         startTime = startTime,
         teamWinningToss = teamWinningToss,
         weather = weather,
-        pitchCondition = pitchCondition
+        pitchCondition = pitchCondition,
+        dateSaved = Clock.System.now(),
+        deleted = false
     )
 
 }

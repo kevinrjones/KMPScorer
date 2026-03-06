@@ -13,7 +13,7 @@ plugins {
 }
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "cricket.knowledgespike.scorerlibrary"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
 
@@ -107,4 +107,9 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+// make resources public so they are available in other modules
+compose.resources {
+    publicResClass = true
 }

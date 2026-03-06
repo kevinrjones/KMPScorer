@@ -9,17 +9,23 @@ import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.usecase.
 import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.usecase.SortByDate
 import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.usecase.SortOrder
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class ScorecardListVewModel(
     private val useCases: ListScorecardUseCases
 ) : ViewModel() {
     private val _state = MutableStateFlow(ScorecardListState())
     val state = _state.asStateFlow()
+
+    private val _listScorecardEvent = MutableSharedFlow<ListScorecardEvent>()
+    val listScorecardEvent = _listScorecardEvent.asSharedFlow()
 
     private var _sortOrder: MutableState<SortOrder> = mutableStateOf(SortByDate)
     var sortOrder: State<SortOrder> = _sortOrder
@@ -30,9 +36,21 @@ class ScorecardListVewModel(
         loadScorecards(sortOrder.value)
     }
 
+    fun updateExpandedState(selected: ScorecardDetailsView, newState: Boolean) {
+        _state.update { state ->
+            state.copy(scorecards = state.scorecards.map {
+                if (it == selected) {
+                    it.copy(isExpanded = newState)
+                } else {
+                    it
+                }
+            })
+        }
+    }
+
 
     fun onAction(action: ScorecardListAction) {
-        when(action) {
+        when (action) {
             is ScorecardListAction.OnSearchQueryChange -> {
                 _state.update {
                     it.copy(
@@ -41,17 +59,33 @@ class ScorecardListVewModel(
                     )
                 }
             }
+
             is ScorecardListAction.onAddOrEditScorecard -> Unit
             is ScorecardListAction.onScore -> Unit
         }
     }
 
-    fun onEvent(event: ListScorecardEvent) {
+    fun onEvent(event: ListScorecardUiEvent) {
         when (event) {
-            is ListScorecardEvent.Order -> {
+            is ListScorecardUiEvent.Order -> {
                 _sortOrder.value = event.order
                 loadScorecards(event.order)
             }
+
+            is ListScorecardUiEvent.TryDelete -> {
+                viewModelScope.launch {
+                    // todo: Should I delete
+                }
+            }
+
+            is ListScorecardUiEvent.DoDelete -> viewModelScope.launch {
+                if (useCases.deleteScorecard(event.scorecard)) {
+                    _listScorecardEvent.emit(ListScorecardEvent.Deleted(event.scorecard))
+                } else {
+                    _listScorecardEvent.emit(ListScorecardEvent.ErrorDeletingScorecard)
+                }
+            }
+
         }
     }
 
@@ -59,8 +93,11 @@ class ScorecardListVewModel(
         job?.cancel()
 
         job = useCases.getScorecards(sortOrder).onEach { scorecards ->
-
-            _state.update { it.copy(scorecards = scorecards) }
+            _state.update {
+                it.copy(scorecards = scorecards.map {
+                    ScorecardDetailsView(it, false)
+                })
+            }
 
 
         }.launchIn(viewModelScope)
