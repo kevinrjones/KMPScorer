@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
 import cricket.knowledgespike.scorer.ui.theme.ScorerTheme
 import kmpscorer.shared.generated.resources.Res
-import kmpscorer.shared.generated.resources.delete
 import kmpscorer.shared.generated.resources.edit
 import kmpscorer.shared.generated.resources.score
 import org.jetbrains.compose.resources.stringResource

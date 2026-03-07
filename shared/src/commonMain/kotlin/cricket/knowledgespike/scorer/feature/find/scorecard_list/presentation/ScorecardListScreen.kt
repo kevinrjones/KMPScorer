@@ -165,8 +165,8 @@ fun ScorecardListScreen(
                                     updateExpandedState(scorecard, false)
                                 },
                                 icon = Icons.Default.Delete,
-                                backgroundColor = MaterialTheme.colorScheme.errorContainer,
-                                tint = MaterialTheme.colorScheme.error,
+                                backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+                                tint = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier
                                     .height(64.dp)
                                     .width(64.dp)
@@ -204,12 +204,14 @@ private val dummyScorecardIdentifyingDetails = (1..10).map {
 @Composable
 fun ScorecardListScreenPreview() {
     ScorerTheme {
+        var count = 0
         ScorecardListScreen(
             innerPadding = PaddingValues(10.dp),
             state = ScorecardListState(scorecards = dummyScorecardIdentifyingDetails.map {
+                count++
                 ScorecardDetailsView(
                     it,
-                    false
+                    count == 1
                 )
             }),
             onAction = {},
