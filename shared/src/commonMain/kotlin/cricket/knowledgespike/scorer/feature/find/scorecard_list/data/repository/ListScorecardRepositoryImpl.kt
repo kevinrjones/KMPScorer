@@ -6,8 +6,8 @@ import com.knowledgespike.scorer.data.source.ScorecardDao
 import cricket.knowledgespike.scorer.data.entity.toEntity
 import cricket.knowledgespike.scorer.data.entity.toScorecardHeaderDetails
 import cricket.knowledgespike.scorer.domain.ScorecardError
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
-import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.repository.ListScorecardRepository
+import cricket.knowledgespike.scorer.domain.model.ScorecardHeaderDetails
+import cricket.knowledgespike.scorer.domain.repository.ListScorecardRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

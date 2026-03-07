@@ -1,5 +1,6 @@
 package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase
 
+import cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateBattingSide
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

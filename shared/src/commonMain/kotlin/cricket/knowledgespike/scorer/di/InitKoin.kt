@@ -1,7 +1,7 @@
 package cricket.knowledgespike.scorer.di
 
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.addEditModule
-import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.usecase.scorecardListEditModule
+import cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.addEditModule
+import cricket.knowledgespike.scorer.domain.usecase.create_scorecard.scorecardListEditModule
 import org.koin.core.context.startKoin
 import org.koin.dsl.KoinAppDeclaration
 

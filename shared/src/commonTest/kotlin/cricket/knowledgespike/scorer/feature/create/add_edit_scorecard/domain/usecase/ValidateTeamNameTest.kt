@@ -1,5 +1,6 @@
 package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase
 
+import cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateTeamName
 import cricket.knowledgespike.scorer.foundation.compose.UiText
 import kotlin.test.BeforeTest
 import kotlin.test.Test

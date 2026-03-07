@@ -39,7 +39,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.AddEditScorecardUseCases
+import cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases
 import cricket.knowledgespike.scorer.foundation.compose.UiText
 import cricket.knowledgespike.scorer.foundation.compose.moveFocusOnTab
 import kmpscorer.shared.generated.resources.Res

@@ -1,6 +1,6 @@
 package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.presentation
 
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
+import cricket.knowledgespike.scorer.domain.model.ScorecardHeaderDetails
 
 data class AddEditScorecardState(
     val id: Int?,

@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
+import cricket.knowledgespike.scorer.domain.model.ScorecardHeaderDetails
 import cricket.knowledgespike.scorer.foundation.compose.ActionIcon
 import cricket.knowledgespike.scorer.foundation.compose.Swipeable
 import cricket.knowledgespike.scorer.ui.theme.ScorerTheme

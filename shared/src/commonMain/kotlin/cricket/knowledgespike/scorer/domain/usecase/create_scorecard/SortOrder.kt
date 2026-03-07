@@ -1,4 +1,4 @@
-package cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.usecase
+package cricket.knowledgespike.scorer.domain.usecase.create_scorecard
 
 sealed class SortOrder()
 

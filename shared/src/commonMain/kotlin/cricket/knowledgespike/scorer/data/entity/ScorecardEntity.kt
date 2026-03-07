@@ -3,7 +3,7 @@ package cricket.knowledgespike.scorer.data.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
+import cricket.knowledgespike.scorer.domain.model.ScorecardHeaderDetails
 import kotlin.time.Clock
 import kotlin.time.Instant
 

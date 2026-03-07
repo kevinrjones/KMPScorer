@@ -1,7 +1,7 @@
-package cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.usecase
+package cricket.knowledgespike.scorer.domain.usecase.create_scorecard
 
 import cricket.knowledgespike.scorer.feature.find.scorecard_list.data.repository.ListScorecardRepositoryImpl
-import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.repository.ListScorecardRepository
+import cricket.knowledgespike.scorer.domain.repository.ListScorecardRepository
 import cricket.knowledgespike.scorer.feature.find.scorecard_list.presentation.ScorecardListVewModel
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf

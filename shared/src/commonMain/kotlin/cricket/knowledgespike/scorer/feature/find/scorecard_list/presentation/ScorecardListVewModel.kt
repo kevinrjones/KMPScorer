@@ -5,9 +5,9 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.usecase.ListScorecardUseCases
-import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.usecase.SortByDate
-import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.usecase.SortOrder
+import cricket.knowledgespike.scorer.domain.usecase.create_scorecard.ListScorecardUseCases
+import cricket.knowledgespike.scorer.domain.usecase.create_scorecard.SortByDate
+import cricket.knowledgespike.scorer.domain.usecase.create_scorecard.SortOrder
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

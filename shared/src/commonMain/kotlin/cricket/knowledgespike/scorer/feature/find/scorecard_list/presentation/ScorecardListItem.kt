@@ -22,7 +22,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
+import cricket.knowledgespike.scorer.domain.model.ScorecardHeaderDetails
 import cricket.knowledgespike.scorer.ui.theme.ScorerTheme
 import kmpscorer.shared.generated.resources.Res
 import kmpscorer.shared.generated.resources.edit

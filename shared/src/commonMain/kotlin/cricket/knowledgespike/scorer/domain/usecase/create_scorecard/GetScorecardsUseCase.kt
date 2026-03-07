@@ -1,6 +1,6 @@
-package cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.usecase
+package cricket.knowledgespike.scorer.domain.usecase.create_scorecard
 
-import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.repository.ListScorecardRepository
+import cricket.knowledgespike.scorer.domain.repository.ListScorecardRepository
 
 class GetScorecardsUseCase(private val repository: ListScorecardRepository) {
     // todo: getRemoteScorecardsv

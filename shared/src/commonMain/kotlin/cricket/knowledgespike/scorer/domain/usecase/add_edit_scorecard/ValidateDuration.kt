@@ -1,4 +1,4 @@
-package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase
+package cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard
 
 import cricket.knowledgespike.scorer.foundation.ValidationResult
 import cricket.knowledgespike.scorer.foundation.isEmptyValidation

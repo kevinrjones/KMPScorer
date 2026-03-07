@@ -7,8 +7,8 @@ import cricket.knowledgespike.scorer.data.entity.toEntity
 import cricket.knowledgespike.scorer.data.entity.toScorecardHeaderDetails
 import cricket.knowledgespike.scorer.domain.ScorecardError.Local
 import cricket.knowledgespike.scorer.domain.ScorecardError.Local.UnableToInsertScorecard
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.repository.AddEditScorecardRepository
+import cricket.knowledgespike.scorer.domain.model.ScorecardHeaderDetails
+import cricket.knowledgespike.scorer.domain.repository.AddEditScorecardRepository
 
 // todo: I hate the name Impl
 class AddEditScorecardRepositoryImpl(val dao: ScorecardDao) : AddEditScorecardRepository {

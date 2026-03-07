@@ -1,4 +1,4 @@
-package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model
+package cricket.knowledgespike.scorer.domain.model
 
 data class ScorecardHeaderDetails(
     val id: Int? = null,

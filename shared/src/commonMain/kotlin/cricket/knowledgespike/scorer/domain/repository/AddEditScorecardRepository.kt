@@ -1,8 +1,8 @@
-package cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.repository
+package cricket.knowledgespike.scorer.domain.repository
 
 import arrow.core.Either
 import cricket.knowledgespike.scorer.domain.ScorecardError
-import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.model.ScorecardHeaderDetails
+import cricket.knowledgespike.scorer.domain.model.ScorecardHeaderDetails
 
 interface AddEditScorecardRepository {
     suspend fun getScorecard(id: Int): Either<ScorecardError.Local, ScorecardHeaderDetails>
