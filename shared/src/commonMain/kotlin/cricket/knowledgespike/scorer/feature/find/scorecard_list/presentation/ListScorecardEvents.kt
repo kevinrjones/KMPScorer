@@ -6,6 +6,5 @@ import cricket.knowledgespike.scorer.feature.find.scorecard_list.domain.usecase.
 sealed interface ListScorecardUiEvent {
     data class Order(val order: SortOrder) : ListScorecardUiEvent
     data class TryDelete(val scorecard: ScorecardHeaderDetails) : ListScorecardUiEvent
-    data class DoDelete(val scorecard: ScorecardHeaderDetails) : ListScorecardUiEvent
 }
 

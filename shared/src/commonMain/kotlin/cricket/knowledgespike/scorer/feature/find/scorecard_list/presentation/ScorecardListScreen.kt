@@ -5,9 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -25,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -62,7 +62,6 @@ fun MatchListScreenRoot(
         viewModel.listScorecardEvent.collectLatest { event ->
             when (event) {
                 is ListScorecardEvent.Deleted -> {
-                    // todo: should I delete?
                     snackbarHostState.showSnackbar(message = deletingMessage)
                 }
 
@@ -150,35 +149,33 @@ fun ScorecardListScreen(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                items(state.scorecards) { match ->
+                items(state.scorecards) { scorecard ->
                     Swipeable(
-                        isRevealed = match.isExpanded,
+                        isRevealed = scorecard.isExpanded,
                         onExpanded = {
-                            updateExpandedState(match, true)
+                            updateExpandedState(scorecard, true)
                         },
                         onCollapsed = {
-                            updateExpandedState(match, false)
+                            updateExpandedState(scorecard, false)
                         },
                         actions = {
                             ActionIcon(
                                 onClick = {
-                                    println("Delete was clicked")
-                                    updateExpandedState(match, false)
-//                                    contacts[index] = contact.copy(isOptionsRevealed = false)
-//                                    Toast.makeText(
-//                                        context,
-//                                        "Contact ${contact.id} was sent an email.",
-//                                        Toast.LENGTH_SHORT
-//                                    ).show()
+                                    onUiEvent(ListScorecardUiEvent.TryDelete(scorecard.scorecardHeaderDetails))
+                                    updateExpandedState(scorecard, false)
                                 },
-                                backgroundColor = Color.Red,
                                 icon = Icons.Default.Delete,
-                                modifier = Modifier.fillMaxHeight()
+                                backgroundColor = MaterialTheme.colorScheme.errorContainer,
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier
+                                    .height(64.dp)
+                                    .width(64.dp)
+                                    .padding(4.dp),
                             )
                         },
                     ) {
                         ScorecardListItem(
-                            scorecard = match.scorecardHeaderDetails,
+                            scorecard = scorecard.scorecardHeaderDetails,
                             onEdit = { id -> onAction(ScorecardListAction.onAddOrEditScorecard(id)) },
                             onDelete = { scorecard ->
                                 onUiEvent(ListScorecardUiEvent.TryDelete(scorecard))
@@ -217,7 +214,7 @@ fun ScorecardListScreenPreview() {
             }),
             onAction = {},
             onUiEvent = {},
-            updateExpandedState = {_, _ -> },
+            updateExpandedState = { _, _ -> },
             isExpandedScreen = false,
         )
     }

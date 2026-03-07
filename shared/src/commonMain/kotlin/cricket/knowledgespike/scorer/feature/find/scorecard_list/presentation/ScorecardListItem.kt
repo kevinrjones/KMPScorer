@@ -109,12 +109,6 @@ fun ScorecardListItem(
                 }
 
                 Button(onClick = {
-                    onDelete(scorecard)
-                }) {
-                    Text(text = stringResource(Res.string.delete))
-                }
-
-                Button(onClick = {
                     onScore(scorecard.id)
                 }) {
                     Text(text = stringResource(Res.string.score))

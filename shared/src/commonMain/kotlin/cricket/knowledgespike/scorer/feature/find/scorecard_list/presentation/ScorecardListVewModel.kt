@@ -74,18 +74,13 @@ class ScorecardListVewModel(
 
             is ListScorecardUiEvent.TryDelete -> {
                 viewModelScope.launch {
-                    // todo: Should I delete
+                    if (useCases.deleteScorecard(event.scorecard)) {
+                        _listScorecardEvent.emit(ListScorecardEvent.Deleted(event.scorecard))
+                    } else {
+                        _listScorecardEvent.emit(ListScorecardEvent.ErrorDeletingScorecard)
+                    }
                 }
             }
-
-            is ListScorecardUiEvent.DoDelete -> viewModelScope.launch {
-                if (useCases.deleteScorecard(event.scorecard)) {
-                    _listScorecardEvent.emit(ListScorecardEvent.Deleted(event.scorecard))
-                } else {
-                    _listScorecardEvent.emit(ListScorecardEvent.ErrorDeletingScorecard)
-                }
-            }
-
         }
     }
 

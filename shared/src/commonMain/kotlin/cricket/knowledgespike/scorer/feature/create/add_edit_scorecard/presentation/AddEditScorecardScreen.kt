@@ -35,11 +35,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cricket.knowledgespike.scorer.feature.create.add_edit_scorecard.domain.usecase.AddEditScorecardUseCases
 import cricket.knowledgespike.scorer.foundation.compose.UiText
+import cricket.knowledgespike.scorer.foundation.compose.moveFocusOnTab
 import kmpscorer.shared.generated.resources.Res
 import kmpscorer.shared.generated.resources.batting_side_label
 import kmpscorer.shared.generated.resources.cancel
@@ -712,9 +714,12 @@ fun AddEditScorecardScreenField(
     onValueChange: (String) -> Unit,
     errorMessage: UiText? = null
 ) {
+    val focusManager = LocalFocusManager.current
     Column(modifier = modifier) {
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .moveFocusOnTab(focusManager)
+                .fillMaxWidth(),
             label = {
                 Text(stringResource(labelId))
             },

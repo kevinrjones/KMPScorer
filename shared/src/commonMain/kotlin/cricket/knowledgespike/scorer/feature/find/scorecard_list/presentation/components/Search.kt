@@ -14,9 +14,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cricket.knowledgespike.scorer.foundation.compose.moveFocusOnTab
 import kmpscorer.shared.generated.resources.Res
 import kmpscorer.shared.generated.resources.opponents_label
 import kmpscorer.shared.generated.resources.search
@@ -30,8 +36,9 @@ fun FindMatches(
     modifier: Modifier = Modifier,
 ) {
 
-    var teamName = ""
-    var opponentsName = ""
+    var teamName by remember { mutableStateOf("") }
+    var opponentsName by remember { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
 
     Scaffold(
     ) { innerPadding ->
@@ -42,7 +49,9 @@ fun FindMatches(
             Column {
                 Row() {
                     OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .moveFocusOnTab(focusManager),
                         label = {
                             Text(stringResource(Res.string.team_label))
                         },
@@ -57,7 +66,9 @@ fun FindMatches(
                 Spacer(modifier = Modifier.height(4.dp))
                 Row {
                     OutlinedTextField(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .moveFocusOnTab(focusManager),
                         label = {
                             Text(stringResource(Res.string.opponents_label))
                         },
