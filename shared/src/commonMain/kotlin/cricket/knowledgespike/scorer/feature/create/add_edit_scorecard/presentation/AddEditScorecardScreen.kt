@@ -140,7 +140,7 @@ fun AddEditScorecardScreenRoot(
 @Composable
 fun AddEditScorecardScreen(
     innerPadding: PaddingValues,
-    useCases: cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases,
+    useCases: AddEditScorecardUseCases,
     state: AddEditScorecardState,
     onUiEvent: (AddEditScorecardUiEvent) -> Unit,
     onSaveOrCancel: () -> Unit,
@@ -202,7 +202,7 @@ fun AddEditScorecardScreen(
 fun TwoColumnDisplay(
     modifier: Modifier = Modifier,
     state: AddEditScorecardState,
-    useCases: cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases,
+    useCases: AddEditScorecardUseCases,
     onEvent: (event: AddEditScorecardUiEvent) -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -478,7 +478,7 @@ fun TwoColumnDisplay(
 private fun SingleColumnDisplay(
     modifier: Modifier = Modifier,
     state: AddEditScorecardState,
-    useCases: cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases,
+    useCases: AddEditScorecardUseCases,
     onEvent: (event: AddEditScorecardUiEvent) -> Unit
 ) {
 

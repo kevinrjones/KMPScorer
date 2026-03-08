@@ -7,7 +7,7 @@ class ValidateTeamWinningToss {
         if(teamWinningToss.isBlank()) return ValidationReason.Empty
 
         return if (teamWinningToss != teamName && teamWinningToss != opponentsName) {
-            ValidationReason.BattingSide
+            ValidationReason.TeamWinningToss
         } else {
             ValidationReason.Succeeded
         }

@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ScorecardListVewModel(
-    private val useCases: cricket.knowledgespike.scorer.domain.usecase.create_scorecard.ListScorecardUseCases
+    private val useCases: ListScorecardUseCases
 ) : ViewModel() {
     private val _state = MutableStateFlow(ScorecardListState())
     val state = _state.asStateFlow()
@@ -27,10 +27,9 @@ class ScorecardListVewModel(
     private val _listScorecardEvent = MutableSharedFlow<ListScorecardEvent>()
     val listScorecardEvent = _listScorecardEvent.asSharedFlow()
 
-    private var _sortOrder: MutableState<cricket.knowledgespike.scorer.domain.usecase.create_scorecard.SortOrder> = mutableStateOf(
-        _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.create_scorecard.SortByDate
+    private var _sortOrder: MutableState<SortOrder> = mutableStateOf(        SortByDate
     )
-    var sortOrder: State<cricket.knowledgespike.scorer.domain.usecase.create_scorecard.SortOrder> = _sortOrder
+    var sortOrder: State<SortOrder> = _sortOrder
 
     var job: Job? = null
 
@@ -86,7 +85,7 @@ class ScorecardListVewModel(
         }
     }
 
-    private fun loadScorecards(sortOrder: cricket.knowledgespike.scorer.domain.usecase.create_scorecard.SortOrder) {
+    private fun loadScorecards(sortOrder: SortOrder) {
         job?.cancel()
 
         job = useCases.getScorecards(sortOrder).onEach { scorecards ->

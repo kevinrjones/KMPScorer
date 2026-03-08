@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class AddEditScorecardViewModel(
     savedStateHandle: SavedStateHandle?,
-    val addEditScorecardUseCases: cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases
+    val addEditScorecardUseCases: AddEditScorecardUseCases
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddEditScorecardState(id = null))
