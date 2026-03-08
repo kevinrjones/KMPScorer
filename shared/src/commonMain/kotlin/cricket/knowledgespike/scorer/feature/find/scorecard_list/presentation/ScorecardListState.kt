@@ -11,5 +11,5 @@ data class ScorecardListState(
     val error: UiText? = null
 )
 
-data class ScorecardDetailsView(val scorecardHeaderDetails: ScorecardHeaderDetails, val isExpanded: Boolean = false)
+data class ScorecardDetailsView(val scorecardHeaderDetails: ScorecardHeaderDetails, val isLeftRevealed: Boolean = false, val isRightRevealed: Boolean = false)
 

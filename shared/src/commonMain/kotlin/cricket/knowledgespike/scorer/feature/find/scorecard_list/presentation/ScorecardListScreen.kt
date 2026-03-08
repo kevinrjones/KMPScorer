@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddToQueue
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -151,13 +154,8 @@ fun ScorecardListScreen(
             ) {
                 items(state.scorecards) { scorecard ->
                     Swipeable(
-                        isRevealed = scorecard.isExpanded,
-                        onExpanded = {
-                            updateExpandedState(scorecard, true)
-                        },
-                        onCollapsed = {
-                            updateExpandedState(scorecard, false)
-                        },
+                        isLeftRevealed = scorecard.isLeftRevealed,
+                        isRightRevealed = scorecard.isRightRevealed,
                         actions = {
                             ActionIcon(
                                 onClick = {
@@ -173,16 +171,44 @@ fun ScorecardListScreen(
                                     .padding(4.dp),
                             )
                         },
-                    ) {
-                        ScorecardListItem(
-                            scorecard = scorecard.scorecardHeaderDetails,
-                            onEdit = { id -> onAction(ScorecardListAction.onAddOrEditScorecard(id)) },
-                            onDelete = { scorecard ->
-                                onUiEvent(ListScorecardUiEvent.TryDelete(scorecard))
-                            },
-                            onScore = { id -> onAction(ScorecardListAction.onScore(id)) }
-                        )
-                    }
+                        secondaryActions = {
+                            ActionIcon(
+                                onClick = {
+                                    onAction(ScorecardListAction.onScore(scorecard.scorecardHeaderDetails.id))
+                                },
+                                icon = Icons.AutoMirrored.Filled.LibraryBooks,
+                                backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+                                tint = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier
+                                    .height(64.dp)
+                                    .width(64.dp)
+                                    .padding(4.dp),
+                            )
+                        },
+
+                        onExpanded = {
+                            updateExpandedState(scorecard, true)
+                        },
+                        onCollapsed = {
+                            updateExpandedState(scorecard, false)
+                        },
+                        content = {
+                            ScorecardListItem(
+                                scorecard = scorecard.scorecardHeaderDetails,
+                                onEdit = { id ->
+                                    onAction(
+                                        ScorecardListAction.onAddOrEditScorecard(
+                                            id
+                                        )
+                                    )
+                                },
+                                onDelete = { scorecard ->
+                                    onUiEvent(ListScorecardUiEvent.TryDelete(scorecard))
+                                },
+                                onScore = { id -> onAction(ScorecardListAction.onScore(id)) }
+                            )
+                        },
+                    )
                 }
             }
         }
@@ -210,8 +236,9 @@ fun ScorecardListScreenPreview() {
             state = ScorecardListState(scorecards = dummyScorecardIdentifyingDetails.map {
                 count++
                 ScorecardDetailsView(
-                    it,
-                    count == 1
+                    scorecardHeaderDetails = it,
+                    isLeftRevealed = count == 1,
+                    isRightRevealed = count == 2
                 )
             }),
             onAction = {},

@@ -41,7 +41,7 @@ class ScorecardListVewModel(
         _state.update { state ->
             state.copy(scorecards = state.scorecards.map {
                 if (it == selected) {
-                    it.copy(isExpanded = newState)
+                    it.copy(isLeftRevealed = newState)
                 } else {
                     it
                 }
