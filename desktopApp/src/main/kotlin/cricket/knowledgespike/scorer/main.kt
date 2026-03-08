@@ -13,7 +13,7 @@ fun main() {
 
         Window(
             onCloseRequest = ::exitApplication,
-            title = "KMP Scorer",
+            title = "Knowledgespike Cricket Scorer",
         ) {
             val widthSizeClass = calculateWindowSizeClass().widthSizeClass
             App(widthSizeClass)

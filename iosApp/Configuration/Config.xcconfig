@@ -1,6 +1,6 @@
 TEAM_ID=
 
-PRODUCT_NAME=KMP Scorer
+PRODUCT_NAME=Knowledgespike Cricket Scorer
 PRODUCT_BUNDLE_IDENTIFIER=cricket.knowledgespike.scorer.KMPScorer$(TEAM_ID)
 
 CURRENT_PROJECT_VERSION=1
