@@ -41,11 +41,22 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases
 import cricket.knowledgespike.scorer.foundation.compose.moveFocusOnTab
+import cricket.knowledgespike.scorer.foundation.validation.ValidationReason
 import kmpscorer.shared.generated.resources.Res
 import kmpscorer.shared.generated.resources.batting_side_label
 import kmpscorer.shared.generated.resources.cancel
 import kmpscorer.shared.generated.resources.date_label
 import kmpscorer.shared.generated.resources.duration_label
+import kmpscorer.shared.generated.resources.invalid_batting_side_name
+import kmpscorer.shared.generated.resources.invalid_team_winning_toss_name
+import kmpscorer.shared.generated.resources.missing_date
+import kmpscorer.shared.generated.resources.missing_duration
+import kmpscorer.shared.generated.resources.missing_match_title
+import kmpscorer.shared.generated.resources.missing_scorer
+import kmpscorer.shared.generated.resources.missing_start_time
+import kmpscorer.shared.generated.resources.missing_team_name
+import kmpscorer.shared.generated.resources.missing_type_of_match
+import kmpscorer.shared.generated.resources.missing_venue
 import kmpscorer.shared.generated.resources.opponents_label
 import kmpscorer.shared.generated.resources.pitch_conditions_label
 import kmpscorer.shared.generated.resources.referee_label
@@ -213,13 +224,13 @@ fun TwoColumnDisplay(
         ) {
 
 
-            var result = useCases.validateTeamName(state.teamName)
+            var result: ValidationReason = useCases.validateTeamName(state.teamName)
             AddEditScorecardScreenField(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.teamName,
                 labelId = Res.string.team_label,
-                isError = result.error && state.teamNameChanged,
-                errorMessage = result.errorMessage,
+                isError = result !is ValidationReason.Succeeded && state.teamNameChanged,
+                errorMessage = Res.string.missing_team_name,
                 onValueChange = {
                     onEvent(AddEditScorecardUiEvent.EnteredTeamName(it))
                 })
@@ -241,8 +252,8 @@ fun TwoColumnDisplay(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.opponentsName,
                 labelId = Res.string.opponents_label,
-                isError = result.error && state.opponentsNameChanged,
-                errorMessage = result.errorMessage,
+                isError = (result !is ValidationReason.Succeeded) && state.opponentsNameChanged,
+                errorMessage = Res.string.missing_team_name,
                 onValueChange = {
                     onEvent(AddEditScorecardUiEvent.EnteredOpponentsName(it))
                 },
@@ -257,8 +268,8 @@ fun TwoColumnDisplay(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.venue,
                 labelId = Res.string.venue_label,
-                isError = result.error && state.venueChanged,
-                errorMessage = result.errorMessage,
+                isError = (result !is ValidationReason.Succeeded) && state.venueChanged,
+                errorMessage = Res.string.missing_venue,
                 onValueChange = {
                     onEvent(AddEditScorecardUiEvent.EnteredVenue(it))
                 },
@@ -270,8 +281,8 @@ fun TwoColumnDisplay(
                 modifier = Modifier.fillMaxWidth(),
                 value = state.title,
                 labelId = Res.string.title_label,
-                isError = result.error && state.titleChanged,
-                errorMessage = result.errorMessage,
+                isError = (result !is ValidationReason.Succeeded) && state.titleChanged,
+                errorMessage = Res.string.missing_match_title,
                 onValueChange = {
                     onEvent(AddEditScorecardUiEvent.EnteredTitle(it))
                 },
@@ -284,8 +295,8 @@ fun TwoColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.matchDate,
             labelId = Res.string.date_label,
-            isError = result.error && state.matchDateChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.matchDateChanged,
+            errorMessage = Res.string.missing_date,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredDate(it))
             },
@@ -301,8 +312,8 @@ fun TwoColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.battingSide,
             labelId = Res.string.batting_side_label,
-            isError = result.error && state.battingSideChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.battingSideChanged,
+            errorMessage = Res.string.invalid_batting_side_name,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredBattingSide(it))
             },
@@ -360,8 +371,8 @@ fun TwoColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.scorer1Name,
             labelId = Res.string.scorer1_label,
-            isError = result.error && state.scorer1NameChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.scorer1NameChanged,
+            errorMessage = Res.string.missing_scorer,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredScorer1Name(it))
             },
@@ -385,8 +396,8 @@ fun TwoColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.typeOfMatch,
             labelId = Res.string.type_of_match_label,
-            isError = result.error && state.typeOfMatchChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.typeOfMatchChanged,
+            errorMessage = Res.string.missing_type_of_match,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredTypeOfMatch(it))
             },
@@ -398,8 +409,8 @@ fun TwoColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.duration,
             labelId = Res.string.duration_label,
-            isError = result.error && state.durationChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.durationChanged,
+            errorMessage = Res.string.missing_duration,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredDuration(it))
             },
@@ -414,8 +425,8 @@ fun TwoColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.startTime,
             labelId = Res.string.start_time_label,
-            isError = result.error && state.startTimeChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.startTimeChanged,
+            errorMessage = Res.string.missing_start_time,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredStartTime(it))
             },
@@ -431,8 +442,8 @@ fun TwoColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.teamWinningToss,
             labelId = Res.string.team_winning_toss_label,
-            isError = result.error && state.teamWinningTossChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.teamWinningTossChanged,
+            errorMessage = Res.string.invalid_team_winning_toss_name,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredTeamWinningToss(it))
             },
@@ -488,8 +499,8 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.teamName,
             labelId = Res.string.team_label,
-            isError = result.error && state.teamNameChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.teamNameChanged,
+            errorMessage = Res.string.missing_team_name,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredTeamName(it))
             })
@@ -500,8 +511,8 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.opponentsName,
             labelId = Res.string.opponents_label,
-            isError = result.error && state.opponentsNameChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.opponentsNameChanged,
+            errorMessage = Res.string.missing_team_name,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredOpponentsName(it))
             },
@@ -513,8 +524,8 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.venue,
             labelId = Res.string.venue_label,
-            isError = result.error && state.venueChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.venueChanged,
+            errorMessage = Res.string.missing_type_of_match,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredVenue(it))
             },
@@ -526,8 +537,8 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.title,
             labelId = Res.string.title_label,
-            isError = result.error && state.titleChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.titleChanged,
+            errorMessage = Res.string.missing_match_title,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredTitle(it))
             },
@@ -539,8 +550,8 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.matchDate,
             labelId = Res.string.date_label,
-            isError = result.error && state.matchDateChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.matchDateChanged,
+            errorMessage = Res.string.missing_date,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredDate(it))
             },
@@ -556,8 +567,8 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.battingSide,
             labelId = Res.string.batting_side_label,
-            isError = result.error && state.battingSideChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.battingSideChanged,
+            errorMessage = Res.string.invalid_batting_side_name,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredBattingSide(it))
             },
@@ -609,8 +620,8 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.scorer1Name,
             labelId = Res.string.scorer1_label,
-            isError = result.error && state.scorer1NameChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.scorer1NameChanged,
+            errorMessage = Res.string.missing_scorer,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredScorer1Name(it))
             },
@@ -632,8 +643,8 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.typeOfMatch,
             labelId = Res.string.type_of_match_label,
-            isError = result.error && state.typeOfMatchChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.typeOfMatchChanged,
+            errorMessage = Res.string.missing_type_of_match,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredTypeOfMatch(it))
             },
@@ -645,8 +656,8 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.duration,
             labelId = Res.string.duration_label,
-            isError = result.error && state.durationChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.durationChanged,
+            errorMessage = Res.string.missing_duration,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredDuration(it))
             },
@@ -658,8 +669,8 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.startTime,
             labelId = Res.string.start_time_label,
-            isError = result.error && state.startTimeChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.startTimeChanged,
+            errorMessage = Res.string.missing_start_time,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredStartTime(it))
             },
@@ -675,8 +686,8 @@ private fun SingleColumnDisplay(
             modifier = Modifier.fillMaxWidth(),
             value = state.teamWinningToss,
             labelId = Res.string.team_winning_toss_label,
-            isError = result.error && state.teamWinningTossChanged,
-            errorMessage = result.errorMessage,
+            isError = (result !is ValidationReason.Succeeded) && state.teamWinningTossChanged,
+            errorMessage = Res.string.invalid_team_winning_toss_name,
             onValueChange = {
                 onEvent(AddEditScorecardUiEvent.EnteredTeamWinningToss(it))
             },

@@ -1,13 +1,11 @@
 package cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard
 
-import cricket.knowledgespike.scorer.foundation.ValidationResult
-import cricket.knowledgespike.scorer.foundation.isEmptyValidation
-import kmpscorer.shared.generated.resources.Res
-import kmpscorer.shared.generated.resources.start_time_label
+import cricket.knowledgespike.scorer.foundation.validation.ValidationReason
 
 class ValidateStartTime {
-    operator fun invoke(startTime: String) : ValidationResult {
-        return isEmptyValidation(startTime, Res.string.start_time_label)
+    operator fun invoke(startTime: String) : ValidationReason {
+        if(startTime.isBlank()) return ValidationReason.Empty
+        return ValidationReason.Succeeded
     }
 }
 

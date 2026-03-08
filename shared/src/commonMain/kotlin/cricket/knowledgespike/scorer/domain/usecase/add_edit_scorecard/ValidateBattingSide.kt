@@ -1,30 +1,19 @@
 package cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard
 
-import cricket.knowledgespike.scorer.foundation.compose.UiText
-import cricket.knowledgespike.scorer.foundation.ValidationResult
-import cricket.knowledgespike.scorer.foundation.isEmptyValidation
-import kmpscorer.shared.generated.resources.Res
-import kmpscorer.shared.generated.resources.invalid_batting_side_name
+import cricket.knowledgespike.scorer.foundation.validation.ValidationReason
 
 class ValidateBattingSide {
     operator fun invoke(
         battingSide: String,
         teamName: String,
         opponentsName: String
-    ): ValidationResult {
-        val result = isEmptyValidation(battingSide, Res.string.invalid_batting_side_name)
-        if (!result.successful) return result
+    ): ValidationReason {
+        if(battingSide.isBlank()) return ValidationReason.Empty
 
         return if (battingSide != teamName && battingSide != opponentsName) {
-            ValidationResult(
-                successful = false,
-                errorMessage = Res.string.invalid_batting_side_name
-            )
+            ValidationReason.BattingSide
         } else {
-            ValidationResult(
-                successful = true
-            )
+            ValidationReason.Succeeded
         }
-
     }
 }

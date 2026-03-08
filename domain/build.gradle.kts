@@ -2,9 +2,6 @@
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidMultiplatformLibrary)
-    alias(libs.plugins.composeMultiplatform) // Ensure this plugin is applied
-    alias(libs.plugins.composeCompiler)
-
 }
 
 kotlin {
@@ -74,7 +71,6 @@ kotlin {
 
                 implementation(libs.arrow.core)
                 implementation(libs.kotlinx.coroutines.core)
-                implementation(compose.components.resources)
 
             }
         }

@@ -7,6 +7,7 @@ import arrow.core.Either
 import cricket.knowledgespike.scorer.domain.ScorecardError
 import cricket.knowledgespike.scorer.domain.model.ScorecardHeaderDetails
 import cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases
+import cricket.knowledgespike.scorer.foundation.validation.ValidationReason
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -155,16 +156,16 @@ class AddEditScorecardViewModel(
     }
 
     private fun isScorecardValid(): Boolean {
-        return addEditScorecardUseCases.validateTeamName(state.value.teamName).successful
-                && addEditScorecardUseCases.validateTeamName(state.value.opponentsName).successful
-                && addEditScorecardUseCases.validateScorer(state.value.scorer1Name).successful
-                && addEditScorecardUseCases.validateTitle(state.value.title).successful
-                && addEditScorecardUseCases.validateVenue(state.value.venue).successful
-                && addEditScorecardUseCases.validateDuration(state.value.duration).successful
-                && addEditScorecardUseCases.validateBattingSide(state.value.battingSide, state.value.teamName, state.value.opponentsName).successful
-                && addEditScorecardUseCases.validateTeamWinningToss(state.value.battingSide, state.value.teamName, state.value.opponentsName).successful
-                && addEditScorecardUseCases.validateMatchLabel(state.value.typeOfMatch).successful
-                && addEditScorecardUseCases.validateStartTime(state.value.startTime).successful
+        return addEditScorecardUseCases.validateTeamName(state.value.teamName) is ValidationReason.Succeeded
+                && addEditScorecardUseCases.validateTeamName(state.value.opponentsName) is ValidationReason.Succeeded
+                && addEditScorecardUseCases.validateScorer(state.value.scorer1Name) is ValidationReason.Succeeded
+                && addEditScorecardUseCases.validateTitle(state.value.title) is ValidationReason.Succeeded
+                && addEditScorecardUseCases.validateVenue(state.value.venue) is ValidationReason.Succeeded
+                && addEditScorecardUseCases.validateDuration(state.value.duration) is ValidationReason.Succeeded
+                && addEditScorecardUseCases.validateBattingSide(state.value.battingSide, state.value.teamName, state.value.opponentsName) is ValidationReason.Succeeded
+                && addEditScorecardUseCases.validateTeamWinningToss(state.value.battingSide, state.value.teamName, state.value.opponentsName) is ValidationReason.Succeeded
+                && addEditScorecardUseCases.validateMatchLabel(state.value.typeOfMatch) is ValidationReason.Succeeded
+                && addEditScorecardUseCases.validateStartTime(state.value.startTime) is ValidationReason.Succeeded
     }
 }
 

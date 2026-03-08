@@ -1,13 +1,11 @@
 package cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard
 
-import cricket.knowledgespike.scorer.foundation.ValidationResult
-import cricket.knowledgespike.scorer.foundation.isEmptyValidation
-import kmpscorer.shared.generated.resources.Res
-import kmpscorer.shared.generated.resources.missing_match_title
+import cricket.knowledgespike.scorer.foundation.validation.ValidationReason
 
 class ValidateTitle {
-    operator fun invoke(title: String) : ValidationResult {
-        return isEmptyValidation(title, Res.string.missing_match_title)
+    operator fun invoke(title: String) : ValidationReason {
+        if(title.isBlank()) return ValidationReason.Empty
+        return ValidationReason.Succeeded
     }
 }
 
