@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases
-import cricket.knowledgespike.scorer.foundation.compose.UiText
 import cricket.knowledgespike.scorer.foundation.compose.moveFocusOnTab
 import kmpscorer.shared.generated.resources.Res
 import kmpscorer.shared.generated.resources.batting_side_label
@@ -712,7 +711,7 @@ fun AddEditScorecardScreenField(
     labelId: StringResource,
     isError: Boolean = false,
     onValueChange: (String) -> Unit,
-    errorMessage: UiText? = null
+    errorMessage: StringResource? = null
 ) {
     val focusManager = LocalFocusManager.current
     Column(modifier = modifier) {
@@ -733,7 +732,7 @@ fun AddEditScorecardScreenField(
         )
         if (isError && errorMessage != null) {
             Text(
-                text = errorMessage.asString(),
+                text = stringResource(errorMessage),
                 color = MaterialTheme.colorScheme.error,
                 fontSize = 16.sp
             )

@@ -1,4 +1,4 @@
-package cricket.knowledgespike.scorer.domain
+package cricket.knowledgespike.scorer.domain.model
 
 data class ScorecardDescriptor(
     val id: Int?,

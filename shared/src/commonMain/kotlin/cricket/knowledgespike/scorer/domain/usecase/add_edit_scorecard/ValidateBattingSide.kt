@@ -18,7 +18,7 @@ class ValidateBattingSide {
         return if (battingSide != teamName && battingSide != opponentsName) {
             ValidationResult(
                 successful = false,
-                errorMessage = UiText.StringResourceId(Res.string.invalid_batting_side_name)
+                errorMessage = Res.string.invalid_batting_side_name
             )
         } else {
             ValidationResult(

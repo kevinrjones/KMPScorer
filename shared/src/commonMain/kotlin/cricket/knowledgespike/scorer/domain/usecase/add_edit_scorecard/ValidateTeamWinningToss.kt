@@ -15,7 +15,7 @@ class ValidateTeamWinningToss {
         return if (teamWinningToss != teamName && teamWinningToss != opponentsName) {
             ValidationResult(
                 successful = false,
-                errorMessage = UiText.StringResourceId(Res.string.invalid_team_winning_toss_name)
+                errorMessage = Res.string.invalid_team_winning_toss_name
             )
         } else {
             ValidationResult(

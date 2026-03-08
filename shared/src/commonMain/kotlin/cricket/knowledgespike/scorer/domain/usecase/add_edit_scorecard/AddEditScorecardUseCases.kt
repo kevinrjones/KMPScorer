@@ -1,7 +1,5 @@
 package cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard
 
-import cricket.knowledgespike.scorer.domain.usecase.create_scorecard.GetScorecardUseCase
-
 data class AddEditScorecardUseCases(
     val validateTeamName: ValidateTeamName,
     val validateOpponentsName: ValidateOpponentsName,

@@ -75,6 +75,9 @@ kotlin {
             implementation(libs.bundles.ktor)
 
             implementation(libs.arrow.core)
+
+            implementation(project(":domain")) // The name matches the folder name
+
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
