@@ -7,7 +7,8 @@ import kotlin.test.assertTrue
 
 class ValidateBattingSideTest {
 
-    private val validateBattingSide = ValidateBattingSide()
+    private val validateBattingSide =
+        _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateBattingSide()
 
     @Test
     fun `test blank batting side returns failure`() {

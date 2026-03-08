@@ -10,11 +10,12 @@ import kotlin.test.assertIs
 
 class ValidateTeamNameTest {
 
-    private lateinit var validateTeamName: ValidateTeamName
+    private lateinit var validateTeamName: cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateTeamName
 
     @BeforeTest
     fun setUp() {
-        validateTeamName = ValidateTeamName()
+        validateTeamName =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateTeamName()
     }
 
     @Test

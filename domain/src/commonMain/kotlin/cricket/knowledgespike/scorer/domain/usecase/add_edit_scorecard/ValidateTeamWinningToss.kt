@@ -1,6 +1,6 @@
 package cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard
 
-import cricket.knowledgespike.scorer.foundation.validation.ValidationReason
+import cricket.knowledgespike.scorer.foundation.ValidationReason
 
 class ValidateTeamWinningToss {
     operator fun invoke(teamWinningToss: String, teamName: String, opponentsName: String) : ValidationReason {

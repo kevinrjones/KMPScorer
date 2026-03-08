@@ -7,7 +7,7 @@ import arrow.core.Either
 import cricket.knowledgespike.scorer.domain.ScorecardError
 import cricket.knowledgespike.scorer.domain.model.ScorecardHeaderDetails
 import cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases
-import cricket.knowledgespike.scorer.foundation.validation.ValidationReason
+import cricket.knowledgespike.scorer.foundation.ValidationReason
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 
 class AddEditScorecardViewModel(
     savedStateHandle: SavedStateHandle?,
-    val addEditScorecardUseCases: AddEditScorecardUseCases
+    val addEditScorecardUseCases: cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AddEditScorecardState(id = null))

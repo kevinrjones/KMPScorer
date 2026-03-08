@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases
 import cricket.knowledgespike.scorer.foundation.compose.moveFocusOnTab
-import cricket.knowledgespike.scorer.foundation.validation.ValidationReason
+import cricket.knowledgespike.scorer.foundation.ValidationReason
 import kmpscorer.shared.generated.resources.Res
 import kmpscorer.shared.generated.resources.batting_side_label
 import kmpscorer.shared.generated.resources.cancel
@@ -140,7 +140,7 @@ fun AddEditScorecardScreenRoot(
 @Composable
 fun AddEditScorecardScreen(
     innerPadding: PaddingValues,
-    useCases: AddEditScorecardUseCases,
+    useCases: cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases,
     state: AddEditScorecardState,
     onUiEvent: (AddEditScorecardUiEvent) -> Unit,
     onSaveOrCancel: () -> Unit,
@@ -202,7 +202,7 @@ fun AddEditScorecardScreen(
 fun TwoColumnDisplay(
     modifier: Modifier = Modifier,
     state: AddEditScorecardState,
-    useCases: AddEditScorecardUseCases,
+    useCases: cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases,
     onEvent: (event: AddEditScorecardUiEvent) -> Unit
 ) {
     val scrollState = rememberScrollState()
@@ -478,7 +478,7 @@ fun TwoColumnDisplay(
 private fun SingleColumnDisplay(
     modifier: Modifier = Modifier,
     state: AddEditScorecardState,
-    useCases: AddEditScorecardUseCases,
+    useCases: cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.AddEditScorecardUseCases,
     onEvent: (event: AddEditScorecardUiEvent) -> Unit
 ) {
 

@@ -17,56 +17,64 @@ class ValidationUseCasesTests {
 
     @Test
     fun `test ValidateTitle with empty string returns failure`() {
-        val validateTitle = ValidateTitle()
+        val validateTitle =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateTitle()
         val result = validateTitle("")
         assertFalse(result.successful)
     }
 
     @Test
     fun `test ValidateTitle with valid string returns success`() {
-        val validateTitle = ValidateTitle()
+        val validateTitle =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateTitle()
         val result = validateTitle("Match Title")
         assertTrue(result.successful)
     }
 
     @Test
     fun `test ValidateVenue with empty string returns failure`() {
-        val validateVenue = ValidateVenue()
+        val validateVenue =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateVenue()
         val result = validateVenue("")
         assertFalse(result.successful)
     }
 
     @Test
     fun `test ValidateVenue with valid string returns success`() {
-        val validateVenue = ValidateVenue()
+        val validateVenue =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateVenue()
         val result = validateVenue("Lord's")
         assertTrue(result.successful)
     }
 
     @Test
     fun `test ValidateScorer with empty string returns failure`() {
-        val validateScorer = ValidateScorer()
+        val validateScorer =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateScorer()
         val result = validateScorer("")
         assertFalse(result.successful)
     }
 
     @Test
     fun `test ValidateScorer with valid string returns success`() {
-        val validateScorer = ValidateScorer()
+        val validateScorer =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateScorer()
         val result = validateScorer("John Doe")
         assertTrue(result.successful)
     }
 
     @Test
     fun `test ValidateDuration with empty string returns failure`() {
-        val validateDuration = ValidateDuration()
+        val validateDuration =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateDuration()
         val result = validateDuration("")
         assertFalse(result.successful)
     }
 
     @Test
     fun `test ValidateDuration with valid string returns success`() {
-        val validateDuration = ValidateDuration()
+        val validateDuration =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateDuration()
         val result = validateDuration("1 day")
         assertTrue(result.successful)
     }
@@ -87,63 +95,72 @@ class ValidationUseCasesTests {
 
     @Test
     fun `test ValidateMatchDate with empty string returns failure`() {
-        val validateMatchDate = ValidateMatchDate()
+        val validateMatchDate =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateMatchDate()
         val result = validateMatchDate("")
         assertFalse(result.successful)
     }
 
     @Test
     fun `test ValidateMatchDate with valid string returns success`() {
-        val validateMatchDate = ValidateMatchDate()
+        val validateMatchDate =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateMatchDate()
         val result = validateMatchDate("2023-10-27")
         assertTrue(result.successful)
     }
 
     @Test
     fun `test ValidateStartTime with empty string returns failure`() {
-        val validateStartTime = ValidateStartTime()
+        val validateStartTime =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateStartTime()
         val result = validateStartTime("")
         assertFalse(result.successful)
     }
 
     @Test
     fun `test ValidateStartTime with valid string returns success`() {
-        val validateStartTime = ValidateStartTime()
+        val validateStartTime =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateStartTime()
         val result = validateStartTime("10:30")
         assertTrue(result.successful)
     }
 
     @Test
     fun `test ValidateMatchLabel with empty string returns failure`() {
-        val validateMatchLabel = ValidateMatchLabel()
+        val validateMatchLabel =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateMatchLabel()
         val result = validateMatchLabel("")
         assertFalse(result.successful)
     }
 
     @Test
     fun `test ValidateMatchLabel with valid string returns success`() {
-        val validateMatchLabel = ValidateMatchLabel()
+        val validateMatchLabel =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateMatchLabel()
         val result = validateMatchLabel("Test Match")
         assertTrue(result.successful)
     }
 
     @Test
     fun `test ValidateTeamWinningToss with empty string returns failure`() {
-        val validateTeamWinningToss = ValidateTeamWinningToss()
+        val validateTeamWinningToss =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateTeamWinningToss()
         val result = validateTeamWinningToss("", "Team A", "Team B")
         assertFalse(result.successful)
     }
 
     @Test
     fun `test ValidateTeamWinningToss with team matching either name returns success`() {
-        val validateTeamWinningToss = ValidateTeamWinningToss()
+        val validateTeamWinningToss =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateTeamWinningToss()
         assertTrue(validateTeamWinningToss("Team A", "Team A", "Team B").successful)
         assertTrue(validateTeamWinningToss("Team B", "Team A", "Team B").successful)
     }
 
     @Test
     fun `test ValidateTeamWinningToss with team matching neither name returns failure`() {
-        val validateTeamWinningToss = ValidateTeamWinningToss()
+        val validateTeamWinningToss =
+            _root_ide_package_.cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard.ValidateTeamWinningToss()
         val result = validateTeamWinningToss("Team C", "Team A", "Team B")
         assertFalse(result.successful)
     }

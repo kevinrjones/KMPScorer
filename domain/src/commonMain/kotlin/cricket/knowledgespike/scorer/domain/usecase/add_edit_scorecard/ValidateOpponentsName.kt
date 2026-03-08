@@ -1,11 +1,12 @@
 package cricket.knowledgespike.scorer.domain.usecase.add_edit_scorecard
 
-import cricket.knowledgespike.scorer.foundation.validation.ValidationReason
+import cricket.knowledgespike.scorer.foundation.ValidationReason
 
-class ValidateTeamName {
+class ValidateOpponentsName {
     operator fun invoke(name: String) : ValidationReason {
-        if(name.isBlank()) return ValidationReason.Empty
+        if (name.isBlank()) return ValidationReason.Empty
         return ValidationReason.Succeeded
     }
+
 }
 
