@@ -46,3 +46,15 @@ in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and r
 ---
 
 Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+
+### Match Setup Feature
+
+The shared app now includes a `Match Setup` flow with:
+- Required start gate fields: Team A, Team B, scheduled overs, toss winner, toss decision, and match date (`YYYY-MM-DD`)
+- Optional metadata fields: venue, umpire one, umpire two, and weather
+- Desktop access via both visible screen actions and a `Match -> New Match Setup` menu entry
+
+### Domain Documentation
+
+- Language and domain glossary: [`CONTEXT.md`](./CONTEXT.md)
+- Decision record for setup validation boundary: [`docs/adr/0001-core-start-gate-for-match-setup.md`](./docs/adr/0001-core-start-gate-for-match-setup.md)

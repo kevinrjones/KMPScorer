@@ -27,11 +27,15 @@ kotlin {
     }
 
 
-    listOf(
-        iosArm64(),
-        iosX64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
+    val isArm64 = System.getProperty("os.arch") == "aarch64"
+    val iosTargets = mutableListOf(iosArm64())
+    if (isArm64) {
+        iosTargets.add(iosSimulatorArm64())
+    } else {
+        iosTargets.add(iosX64())
+    }
+
+    iosTargets.forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
@@ -93,9 +97,12 @@ kotlin {
 dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
     add("kspAndroid", libs.androidx.room.compiler)
-    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
-    add("kspIosX64", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
+    if (System.getProperty("os.arch") == "aarch64") {
+        add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    } else {
+        add("kspIosX64", libs.androidx.room.compiler)
+    }
     add("kspJvm", libs.androidx.room.compiler)
     add("kspJvmTest", libs.androidx.room.compiler)
 }

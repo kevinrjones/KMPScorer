@@ -1,0 +1,45 @@
+package cricket.knowledgespike.scorer.matchsetup
+
+import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetup
+import cricket.knowledgespike.scorer.domain.matchsetup.TossDecision
+import cricket.knowledgespike.scorer.domain.matchsetup.TossWinner
+
+data class MatchSetupFormState(
+    val teamAName: String = "",
+    val teamBName: String = "",
+    val scheduledOvers: String = "",
+    val tossWinner: TossWinner? = null,
+    val tossDecision: TossDecision? = null,
+    val matchDate: String = "",
+    val venue: String = "",
+    val umpireOne: String = "",
+    val umpireTwo: String = "",
+    val weather: String = "",
+)
+
+data class MatchSetupScreenState(
+    val formState: MatchSetupFormState = MatchSetupFormState(),
+    val canStartMatch: Boolean = false,
+    val startMatchResult: MatchSetupStartMatchResult = MatchSetupStartMatchResult.Idle,
+)
+
+sealed interface MatchSetupStartMatchResult {
+    data object Idle : MatchSetupStartMatchResult
+    data class ValidationError(val message: String) : MatchSetupStartMatchResult
+    data class Ready(val matchSetup: MatchSetup) : MatchSetupStartMatchResult
+}
+
+sealed interface MatchSetupScreenEvent {
+    data class TeamANameChanged(val value: String) : MatchSetupScreenEvent
+    data class TeamBNameChanged(val value: String) : MatchSetupScreenEvent
+    data class ScheduledOversChanged(val value: String) : MatchSetupScreenEvent
+    data class TossWinnerChanged(val value: TossWinner) : MatchSetupScreenEvent
+    data class TossDecisionChanged(val value: TossDecision) : MatchSetupScreenEvent
+    data class MatchDateChanged(val value: String) : MatchSetupScreenEvent
+    data class VenueChanged(val value: String) : MatchSetupScreenEvent
+    data class UmpireOneChanged(val value: String) : MatchSetupScreenEvent
+    data class UmpireTwoChanged(val value: String) : MatchSetupScreenEvent
+    data class WeatherChanged(val value: String) : MatchSetupScreenEvent
+    data object StartMatchRequested : MatchSetupScreenEvent
+    data object ResetRequested : MatchSetupScreenEvent
+}

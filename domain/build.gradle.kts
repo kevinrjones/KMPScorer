@@ -41,20 +41,15 @@ kotlin {
     // https://developer.android.com/kotlin/multiplatform/migrate
     val xcfName = "domainKit"
 
-    iosX64 {
-        binaries.framework {
-            baseName = xcfName
-        }
+    val iosTargets = mutableListOf(iosArm64())
+    if (System.getProperty("os.arch") == "aarch64") {
+        iosTargets.add(iosSimulatorArm64())
+    } else {
+        iosTargets.add(iosX64())
     }
 
-    iosArm64 {
-        binaries.framework {
-            baseName = xcfName
-        }
-    }
-
-    iosSimulatorArm64 {
-        binaries.framework {
+    iosTargets.forEach { iosTarget ->
+        iosTarget.binaries.framework {
             baseName = xcfName
         }
     }
@@ -71,6 +66,7 @@ kotlin {
 
                 implementation(libs.arrow.core)
                 implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.kotlinx.datetime)
 
             }
         }
