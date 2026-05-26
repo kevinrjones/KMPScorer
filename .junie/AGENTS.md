@@ -85,3 +85,14 @@ standard desktop patterns such as menus
 
 The goal is a Kotlin Multiplatform codebase that is explicit, functional, testable, adaptive, and
 easy to maintain.
+
+## Project Memory
+
+After each sprint or completed task, update `docs/project_memory.md` with:
+
+- What was shipped
+- Key decisions
+- Gotchas
+- Title
+- Date/time completed
+- Test coverage areas

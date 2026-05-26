@@ -1,10 +1,15 @@
 package cricket.knowledgespike.scorer
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Scaffold
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cricket.knowledgespike.scorer.matchsetup.MatchSetupScreen
@@ -35,13 +40,19 @@ fun App(
     }
 
     ScorerTheme {
-        when (ScorerRoute.MatchSetupRoute) {
-            ScorerRoute.MatchSetupRoute -> {
-                MatchSetupScreen(
-                    widthSizeClass = widthSizeClass,
-                    screenState = matchSetupScreenState,
-                    onEvent = matchSetupStateStore::onEvent,
-                )
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            contentWindowInsets = WindowInsets.safeDrawing,
+        ) { innerPadding ->
+            when (ScorerRoute.MatchSetupRoute) {
+                ScorerRoute.MatchSetupRoute -> {
+                    MatchSetupScreen(
+                        widthSizeClass = widthSizeClass,
+                        screenState = matchSetupScreenState,
+                        contentPadding = innerPadding,
+                        onEvent = matchSetupStateStore::onEvent,
+                    )
+                }
             }
         }
     }
