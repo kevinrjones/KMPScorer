@@ -52,3 +52,11 @@ After each completed task, append a new dated entry under `Recent Task Log` with
 - Updated in-repo references that previously pointed at numeric-only sprint filenames so document pointers remain accurate after the rename.
 - Why: improve discoverability and readability of sprint documents while preserving sprint-number ordering.
 - Verification: confirmed no remaining references to legacy `SPRINT_[N].md` names via repository markdown scan and reviewed scoped `git status` output.
+
+#### 2026-05-26 11:55 — Desktop window default size and position update
+
+- Title: `Desktop window default size and position update`.
+- What was shipped: updated desktop app startup window defaults to open at `1200dp x 800dp` and centered on screen.
+- Key decisions: configured `Window` with `rememberWindowState(width = 1200.dp, height = 800.dp, position = WindowPosition(Alignment.Center))` in `desktopApp/src/main/kotlin/cricket/knowledgespike/scorer/main.kt`.
+- Gotchas: desktop window sizing/positioning uses Compose window state APIs and `dp` units rather than raw pixel primitives.
+- Test coverage areas: no tests added or run for this task (UI startup default configuration change only).

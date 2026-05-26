@@ -4,11 +4,11 @@ Use names that describe intent.
 
 Prefer:
 
-- `LoadUserUseCase`
-- `UserRepository`
-- `UserScreenState`
-- `UserScreenEvent`
-- `UserDetailsRoute`
+- `LoadPlayerUseCase`
+- `MatchRepository`
+- `MatchSetupScreenState`
+- `ScoringScreenEvent`
+- `MatchDetailsRoute`
 - `toDomain`
 - `toUiState`
 - `toAppError`
@@ -36,7 +36,7 @@ Before submitting changes, verify:
 - UI state is explicit and immutable.
 - Composables are small and mostly stateless.
 - `WindowWidthSizeClass` is used for adaptive layout decisions.
-- Navigation uses Navigation 3 patterns and centralized route definitions.
+- Navigation uses Navigation 3 patterns (via `jetbrains-compose-navigation`) and centralized route definitions.
 - Cyclomatic complexity remains low.
 - Large functions are split into smaller named functions.
 - Tests cover domain logic and state transitions.
@@ -88,7 +88,7 @@ easy to maintain.
 
 ## Project Memory
 
-After each sprint or completed task, update `docs/project_memory.md` with:
+After each sprint or completed task, update `project_memory.md` (at the project root) with:
 
 - What was shipped
 - Key decisions
@@ -96,3 +96,5 @@ After each sprint or completed task, update `docs/project_memory.md` with:
 - Title
 - Date/time completed
 - Test coverage areas
+
+
