@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.MenuBar
@@ -20,10 +21,8 @@ import cricket.knowledgespike.scorer.domain.preferences.DesktopWindowPreferences
 import cricket.knowledgespike.scorer.preferences.AppPreferencesStateStore
 import cricket.knowledgespike.scorer.preferences.JsonPreferencesRepository
 import cricket.knowledgespike.scorer.preferences.OkioPreferencesStorageDataSource
-import java.io.File
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
-import androidx.compose.runtime.snapshotFlow
+import java.io.File
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 fun main() {
