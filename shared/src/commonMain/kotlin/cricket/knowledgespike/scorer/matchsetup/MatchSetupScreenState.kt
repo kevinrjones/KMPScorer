@@ -1,13 +1,15 @@
 package cricket.knowledgespike.scorer.matchsetup
 
 import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetup
+import cricket.knowledgespike.scorer.domain.matchsetup.MatchScheduleType
 import cricket.knowledgespike.scorer.domain.matchsetup.TossDecision
 import cricket.knowledgespike.scorer.domain.matchsetup.TossWinner
 
 data class MatchSetupFormState(
     val teamAName: String = "",
     val teamBName: String = "",
-    val scheduledOvers: String = "",
+    val scheduleType: MatchScheduleType = MatchScheduleType.Overs,
+    val scheduleAmount: String = "",
     val tossWinner: TossWinner? = null,
     val tossDecision: TossDecision? = null,
     val matchDate: String = "",
@@ -15,6 +17,11 @@ data class MatchSetupFormState(
     val umpireOne: String = "",
     val umpireTwo: String = "",
     val weather: String = "",
+)
+
+data class TossWinnerOptionLabels(
+    val teamA: String,
+    val teamB: String,
 )
 
 data class MatchSetupScreenState(
@@ -29,10 +36,22 @@ sealed interface MatchSetupStartMatchResult {
     data class Ready(val matchSetup: MatchSetup) : MatchSetupStartMatchResult
 }
 
+fun MatchSetupFormState.toTossWinnerOptionLabels(): TossWinnerOptionLabels {
+    return TossWinnerOptionLabels(
+        teamA = teamAName.toTossWinnerLabelOrFallback("Team A"),
+        teamB = teamBName.toTossWinnerLabelOrFallback("Team B"),
+    )
+}
+
+private fun String.toTossWinnerLabelOrFallback(teamSlotLabel: String): String {
+    return trim().ifBlank { "$teamSlotLabel (name pending)" }
+}
+
 sealed interface MatchSetupScreenEvent {
     data class TeamANameChanged(val value: String) : MatchSetupScreenEvent
     data class TeamBNameChanged(val value: String) : MatchSetupScreenEvent
-    data class ScheduledOversChanged(val value: String) : MatchSetupScreenEvent
+    data class ScheduleTypeChanged(val value: MatchScheduleType) : MatchSetupScreenEvent
+    data class ScheduleAmountChanged(val value: String) : MatchSetupScreenEvent
     data class TossWinnerChanged(val value: TossWinner) : MatchSetupScreenEvent
     data class TossDecisionChanged(val value: TossDecision) : MatchSetupScreenEvent
     data class MatchDateChanged(val value: String) : MatchSetupScreenEvent

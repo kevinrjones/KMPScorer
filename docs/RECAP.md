@@ -82,3 +82,32 @@ Git commits reviewed (relevant context):
 - `0be6130` (2026-05-26 11:38:03 +0100): `feat: Add product roadmap and refactor Match Setup UI`
 - `3dd4668` (2026-05-26 20:53:24 +0100): `chore: Update desktop window defaults and add testing strategy documentation`
 - No new commit has been created yet for the current cross-platform preferences implementation in the working tree.
+
+### 21:27
+
+Recap from the last recorded work window up to now:
+
+- Completed and tracked the Match Setup UI hardening workstream end-to-end, including documenting and then implementing `U1` to `U6` from `docs/tasks/TASKS_MATCH_SETUP_UI_FIXES_CROSS_PLATFORM.md`.
+- Shipped keyboard and interaction fixes for toss sections on desktop:
+  - `Toss winner` labels now reflect entered team names.
+  - `Tab` / `Shift+Tab` traversal works at group level (not per radio option) for `Toss winner` and `Toss decision`.
+  - Arrow-key navigation now moves both selection and focus, so `Space` activates the currently focused option reliably.
+- Replaced free-text `Match date` input with a cross-platform date picker flow (Android native picker, shared desktop/iOS dialog path), and later updated default picker initialization to open on today's date when no date is set.
+- Enabled `Start a Match` completion flow to navigate into a scoring placeholder route with an explicit `Back to Match setup` path, and updated setup copy from `Rosters` to `Player names`.
+- Extended match schedule modeling and UI from single-field overs input to explicit `schedule type` (`Overs` / `Balls` / `Days`) plus compact numeric amount entry (digits-only, max 3 chars) with domain validation bounds.
+- Expanded and stabilized test coverage across domain/state/UI layers (shared + desktop), repeatedly validating with targeted and aggregate Gradle runs including:
+  - `./gradlew :shared:jvmTest :desktopApp:test --no-daemon`
+  - `./gradlew :shared:jvmTest :desktopApp:test :androidApp:compileDebugSources --no-daemon`
+  - focused desktop UI regression runs for Match Setup keyboard/date/schedule behaviors.
+- Added and maintained sprint/epic task documentation and route/navigation hardening artifacts, including Epic A/B/C task-tracking files and route-driven shell/navigation completion work.
+
+Git commits reviewed (relevant context):
+
+- `41d474f` (2026-05-27 09:55:14 +0100): `feat: Implement cross-platform preferences persistence and GitHub Actions CI/CD`
+- `ae5a842` (2026-05-27 10:00:25 +0100): `ci: Add Android Lint job and concurrency control to desktop workflow`
+- `dcd600c` (2026-05-27 10:02:18 +0100): `chore: Add MIT license and clean up desktop app imports`
+- `b24c99d` (2026-05-27 11:13:33 +0100): `test: Expand cross-platform test coverage for unit and UI layers`
+- `e3cb43e` (2026-05-27 11:14:38 +0100): `Merge branch 'feat/uiupdates'`
+- `5ee6cd5` (2026-05-27 11:16:25 +0100): `chore: Reorganize sprint documentation into a dedicated subdirectory`
+- `4c97e75` (2026-05-27 21:26:15 +0100): `feat: Implement route-driven navigation and harden Match Setup flow`
+- `e8e8268` (2026-05-27 21:26:28 +0100): `Merge branch 'feat/navigation'`

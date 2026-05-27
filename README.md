@@ -2,7 +2,7 @@
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.3.21-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
 [![Compose for Desktop](https://img.shields.io/badge/Compose%20for%20Desktop-1.9.0-4285F4?logo=jetbrains&logoColor=white)](https://www.jetbrains.com/lp/compose-multiplatform/)
-[![License](https://img.shields.io/badge/License-TBD-lightgrey)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 `KMPScorer` is a Kotlin Multiplatform cricket scoring app targeting Android, iOS, and Desktop (JVM), with shared domain and UI logic built using Compose Multiplatform.
 
