@@ -6,8 +6,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import cricket.knowledgespike.scorer.preferences.AppPreferencesStateStore
+import cricket.knowledgespike.scorer.preferences.JsonPreferencesRepository
+import cricket.knowledgespike.scorer.preferences.OkioPreferencesStorageDataSource
+import java.io.File
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
@@ -16,8 +21,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            val appPreferencesStateStore = remember {
+                val preferencesFilePath = File(filesDir, "app_preferences.json").absolutePath
+                AppPreferencesStateStore(
+                    preferencesRepository = JsonPreferencesRepository(
+                        preferencesStorageDataSource = OkioPreferencesStorageDataSource(preferencesFilePath),
+                    ),
+                )
+            }
             val widthSizeClass = calculateWindowSizeClass(this).widthSizeClass
-            App(widthSizeClass)
+            App(
+                widthSizeClass = widthSizeClass,
+                appPreferencesStateStore = appPreferencesStateStore,
+            )
         }
     }
 }

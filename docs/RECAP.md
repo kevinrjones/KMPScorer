@@ -55,3 +55,30 @@ Git commits reviewed (relevant context):
 
 - `44b95d2` (2026-05-25 20:53:33 +0100): `feat: Implement new "Match Setup" flow and refactor project structure`
 - No new commit has been created yet for this per-sprint documentation pass.
+
+## 2026-05-27
+
+### 08:08
+
+Recap from the last recorded work window up to now:
+
+- Continued delivery after the 2026-05-26 planning pass with implementation-focused updates.
+- Added product-planning and UI-flow changes captured by commit `0be6130` (`feat: Add product roadmap and refactor Match Setup UI`).
+- Applied desktop startup and process/documentation improvements captured by commit `3dd4668` (`chore: Update desktop window defaults and add testing strategy documentation`).
+- Implemented a cross-platform preferences mechanism (Android, iOS, Desktop) to persist app settings across sessions, including:
+  - JSON-backed local preferences persistence via `PreferencesRepository` (`JsonPreferencesRepository` + `OkioPreferencesStorageDataSource`)
+  - Domain preferences models and explicit Arrow `Either` persistence failures
+  - Persisted theme preference (`System` / `Light` / `Dark`)
+  - Desktop window state persistence (size and position restore/save)
+  - MRU tracking for recently accessed matches, recorded from match setup completion
+- Wired preferences state usage into platform entry points (`MainActivity`, `MainViewController`, desktop `main.kt`) and shared app/state-store flows.
+- Verified behavior/build stability with:
+  - `./gradlew :shared:jvmTest --no-daemon`
+  - `./gradlew :desktopApp:compileKotlin --no-daemon`
+  - `./gradlew :androidApp:compileDebugSources --no-daemon`
+
+Git commits reviewed (relevant context):
+
+- `0be6130` (2026-05-26 11:38:03 +0100): `feat: Add product roadmap and refactor Match Setup UI`
+- `3dd4668` (2026-05-26 20:53:24 +0100): `chore: Update desktop window defaults and add testing strategy documentation`
+- No new commit has been created yet for the current cross-platform preferences implementation in the working tree.

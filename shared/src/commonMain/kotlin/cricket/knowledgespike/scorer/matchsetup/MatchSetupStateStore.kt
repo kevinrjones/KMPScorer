@@ -1,6 +1,7 @@
 package cricket.knowledgespike.scorer.matchsetup
 
 import cricket.knowledgespike.scorer.domain.matchsetup.CreateMatchSetupUseCase
+import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetup
 import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetupDraft
 import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetupValidationError
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,18 +11,27 @@ import kotlinx.coroutines.flow.update
 
 class MatchSetupStateStore(
     private val createMatchSetupUseCase: CreateMatchSetupUseCase,
+    private val onMatchSetupReady: (MatchSetup) -> Unit = {},
 ) {
 
     private val _screenState = MutableStateFlow(MatchSetupScreenState())
     val screenState: StateFlow<MatchSetupScreenState> = _screenState.asStateFlow()
 
     fun onEvent(event: MatchSetupScreenEvent) {
+        var reducedState: MatchSetupScreenState? = null
         _screenState.update { currentState ->
             reduceMatchSetupScreenState(
                 currentState = currentState,
                 event = event,
                 createMatchSetupUseCase = createMatchSetupUseCase,
-            )
+            ).also { reducedState = it }
+        }
+
+        if (event == MatchSetupScreenEvent.StartMatchRequested) {
+            val matchSetup = (reducedState?.startMatchResult as? MatchSetupStartMatchResult.Ready)?.matchSetup
+            if (matchSetup != null) {
+                onMatchSetupReady(matchSetup)
+            }
         }
     }
 }
