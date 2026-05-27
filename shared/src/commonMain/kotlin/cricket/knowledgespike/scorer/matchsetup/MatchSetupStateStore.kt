@@ -1,9 +1,9 @@
 package cricket.knowledgespike.scorer.matchsetup
 
 import cricket.knowledgespike.scorer.domain.matchsetup.CreateMatchSetupUseCase
-import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetup
 import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetupDraft
 import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetupValidationError
+import cricket.knowledgespike.scorer.navigation.ScorerRoute
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.update
 
 class MatchSetupStateStore(
     private val createMatchSetupUseCase: CreateMatchSetupUseCase,
-    private val onMatchSetupReady: (MatchSetup) -> Unit = {},
+    private val onRouteRequested: (ScorerRoute) -> Unit = {},
 ) {
 
     private val _screenState = MutableStateFlow(MatchSetupScreenState())
@@ -30,7 +30,7 @@ class MatchSetupStateStore(
         if (event == MatchSetupScreenEvent.StartMatchRequested) {
             val matchSetup = (reducedState?.startMatchResult as? MatchSetupStartMatchResult.Ready)?.matchSetup
             if (matchSetup != null) {
-                onMatchSetupReady(matchSetup)
+                onRouteRequested(ScorerRoute.ScoringEntryRoute(matchSetup))
             }
         }
     }
@@ -45,61 +45,67 @@ fun reduceMatchSetupScreenState(
         is MatchSetupScreenEvent.TeamANameChanged -> {
             currentState.withUpdatedForm {
                 copy(teamAName = event.value)
-            }
+            }.evaluatingStartGateWith(createMatchSetupUseCase)
         }
 
         is MatchSetupScreenEvent.TeamBNameChanged -> {
             currentState.withUpdatedForm {
                 copy(teamBName = event.value)
-            }
+            }.evaluatingStartGateWith(createMatchSetupUseCase)
         }
 
-        is MatchSetupScreenEvent.ScheduledOversChanged -> {
+        is MatchSetupScreenEvent.ScheduleTypeChanged -> {
             currentState.withUpdatedForm {
-                copy(scheduledOvers = event.value)
-            }
+                copy(scheduleType = event.value)
+            }.evaluatingStartGateWith(createMatchSetupUseCase)
+        }
+
+        is MatchSetupScreenEvent.ScheduleAmountChanged -> {
+            currentState.withUpdatedForm {
+                copy(scheduleAmount = event.value)
+            }.evaluatingStartGateWith(createMatchSetupUseCase)
         }
 
         is MatchSetupScreenEvent.TossWinnerChanged -> {
             currentState.withUpdatedForm {
                 copy(tossWinner = event.value)
-            }
+            }.evaluatingStartGateWith(createMatchSetupUseCase)
         }
 
         is MatchSetupScreenEvent.TossDecisionChanged -> {
             currentState.withUpdatedForm {
                 copy(tossDecision = event.value)
-            }
+            }.evaluatingStartGateWith(createMatchSetupUseCase)
         }
 
         is MatchSetupScreenEvent.MatchDateChanged -> {
             currentState.withUpdatedForm {
                 copy(matchDate = event.value)
-            }
+            }.evaluatingStartGateWith(createMatchSetupUseCase)
         }
 
         is MatchSetupScreenEvent.VenueChanged -> {
             currentState.withUpdatedForm {
                 copy(venue = event.value)
-            }
+            }.evaluatingStartGateWith(createMatchSetupUseCase)
         }
 
         is MatchSetupScreenEvent.UmpireOneChanged -> {
             currentState.withUpdatedForm {
                 copy(umpireOne = event.value)
-            }
+            }.evaluatingStartGateWith(createMatchSetupUseCase)
         }
 
         is MatchSetupScreenEvent.UmpireTwoChanged -> {
             currentState.withUpdatedForm {
                 copy(umpireTwo = event.value)
-            }
+            }.evaluatingStartGateWith(createMatchSetupUseCase)
         }
 
         is MatchSetupScreenEvent.WeatherChanged -> {
             currentState.withUpdatedForm {
                 copy(weather = event.value)
-            }
+            }.evaluatingStartGateWith(createMatchSetupUseCase)
         }
 
         MatchSetupScreenEvent.StartMatchRequested -> {
@@ -107,7 +113,7 @@ fun reduceMatchSetupScreenState(
             createMatchSetupResult.fold(
                 ifLeft = { validationError ->
                     currentState.copy(
-                        canStartMatch = currentState.formState.canStartMatch(),
+                        canStartMatch = false,
                         startMatchResult = MatchSetupStartMatchResult.ValidationError(validationError.toUiMessage()),
                     )
                 },
@@ -124,12 +130,21 @@ fun reduceMatchSetupScreenState(
     }
 }
 
-private fun MatchSetupScreenState.withUpdatedForm(update: MatchSetupFormState.() -> MatchSetupFormState): MatchSetupScreenState {
+private fun MatchSetupScreenState.withUpdatedForm(
+    update: MatchSetupFormState.() -> MatchSetupFormState,
+): MatchSetupScreenState {
     val updatedFormState = formState.update()
     return copy(
         formState = updatedFormState,
-        canStartMatch = updatedFormState.canStartMatch(),
         startMatchResult = MatchSetupStartMatchResult.Idle,
+    )
+}
+
+private fun MatchSetupScreenState.evaluatingStartGateWith(
+    createMatchSetupUseCase: CreateMatchSetupUseCase,
+): MatchSetupScreenState {
+    return copy(
+        canStartMatch = formState.isStartGateValid(createMatchSetupUseCase),
     )
 }
 
@@ -137,7 +152,8 @@ private fun MatchSetupFormState.toMatchSetupDraft(): MatchSetupDraft {
     return MatchSetupDraft(
         teamAName = teamAName,
         teamBName = teamBName,
-        scheduledOvers = scheduledOvers,
+        scheduleType = scheduleType,
+        scheduleAmount = scheduleAmount,
         tossWinner = tossWinner,
         tossDecision = tossDecision,
         matchDate = matchDate,
@@ -148,13 +164,11 @@ private fun MatchSetupFormState.toMatchSetupDraft(): MatchSetupDraft {
     )
 }
 
-private fun MatchSetupFormState.canStartMatch(): Boolean {
-    return teamAName.isNotBlank() &&
-        teamBName.isNotBlank() &&
-        scheduledOvers.isNotBlank() &&
-        tossWinner != null &&
-        tossDecision != null &&
-        matchDate.isNotBlank()
+private fun MatchSetupFormState.isStartGateValid(createMatchSetupUseCase: CreateMatchSetupUseCase): Boolean {
+    return createMatchSetupUseCase(toMatchSetupDraft()).fold(
+        ifLeft = { false },
+        ifRight = { true },
+    )
 }
 
 private fun MatchSetupValidationError.toUiMessage(): String {
@@ -162,7 +176,7 @@ private fun MatchSetupValidationError.toUiMessage(): String {
         MatchSetupValidationError.MissingTeamAName -> "Team A name is required"
         MatchSetupValidationError.MissingTeamBName -> "Team B name is required"
         MatchSetupValidationError.TeamNamesMustDiffer -> "Team names must be different"
-        MatchSetupValidationError.InvalidScheduledOvers -> "Scheduled overs must be greater than zero"
+        MatchSetupValidationError.InvalidScheduleAmount -> "Schedule amount must be between 1 and 999"
         MatchSetupValidationError.MissingTossWinner -> "Choose the toss winner"
         MatchSetupValidationError.MissingTossDecision -> "Choose the toss decision"
         MatchSetupValidationError.InvalidMatchDate -> "Match date must use YYYY-MM-DD"

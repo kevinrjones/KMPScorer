@@ -34,11 +34,29 @@ class CreateMatchSetupUseCaseTest {
     }
 
     @Test
-    fun `given invalid overs when create match setup then invalid overs error is returned`() {
-        val result = createMatchSetupUseCase(validDraft(scheduledOvers = "0"))
+    fun `given invalid schedule amount when create match setup then invalid schedule amount error is returned`() {
+        val result = createMatchSetupUseCase(validDraft(scheduleAmount = "0"))
 
         assertTrue(result.isLeft())
-        assertEquals(MatchSetupValidationError.InvalidScheduledOvers, result.leftOrNull())
+        assertEquals(MatchSetupValidationError.InvalidScheduleAmount, result.leftOrNull())
+    }
+
+    @Test
+    fun `given schedule amount above three digits when create match setup then invalid schedule amount error is returned`() {
+        val result = createMatchSetupUseCase(validDraft(scheduleAmount = "1000"))
+
+        assertTrue(result.isLeft())
+        assertEquals(MatchSetupValidationError.InvalidScheduleAmount, result.leftOrNull())
+    }
+
+    @Test
+    fun `given days schedule type when create match setup then setup preserves selected schedule type`() {
+        val result = createMatchSetupUseCase(validDraft(scheduleType = MatchScheduleType.Days, scheduleAmount = "3"))
+
+        assertTrue(result.isRight())
+        val setup = assertNotNull(result.getOrNull())
+        assertEquals(MatchScheduleType.Days, setup.schedule.type)
+        assertEquals(3, setup.schedule.amount)
     }
 
     @Test
@@ -66,6 +84,42 @@ class CreateMatchSetupUseCaseTest {
     }
 
     @Test
+    fun `given omitted optional fields when create match setup then setup is created with null optionals`() {
+        val result = createMatchSetupUseCase(
+            validDraft(
+                venue = "   ",
+                umpireOne = "",
+                umpireTwo = " ",
+                weather = "\t",
+            ),
+        )
+
+        assertTrue(result.isRight())
+        val setup = assertNotNull(result.getOrNull())
+        assertEquals(null, setup.venue)
+        assertEquals(null, setup.umpireOne)
+        assertEquals(null, setup.umpireTwo)
+        assertEquals(null, setup.weather)
+    }
+
+    @Test
+    fun `given identical valid draft when create match setup invoked repeatedly then results are deterministic`() {
+        val draft = validDraft(
+            teamAName = "  Falcons  ",
+            teamBName = " Kings ",
+            venue = " Main Ground ",
+            umpireOne = "Umpire One",
+            umpireTwo = "Umpire Two",
+            weather = "Cloudy",
+        )
+
+        val firstResult = createMatchSetupUseCase(draft)
+        val secondResult = createMatchSetupUseCase(draft)
+
+        assertEquals(firstResult, secondResult)
+    }
+
+    @Test
     fun `given valid draft when create match setup then normalized match setup is returned`() {
         val result = createMatchSetupUseCase(
             validDraft(
@@ -80,6 +134,8 @@ class CreateMatchSetupUseCaseTest {
         val setup = assertNotNull(result.getOrNull())
         assertEquals("Falcons", setup.teamAName)
         assertEquals("Kings", setup.teamBName)
+        assertEquals(MatchScheduleType.Overs, setup.schedule.type)
+        assertEquals(20, setup.schedule.amount)
         assertEquals("Main Ground", setup.venue)
         assertEquals(null, setup.umpireOne)
     }
@@ -87,7 +143,8 @@ class CreateMatchSetupUseCaseTest {
     private fun validDraft(
         teamAName: String = "Falcons",
         teamBName: String = "Kings",
-        scheduledOvers: String = "20",
+        scheduleType: MatchScheduleType = MatchScheduleType.Overs,
+        scheduleAmount: String = "20",
         tossWinner: TossWinner? = TossWinner.TeamA,
         tossDecision: TossDecision? = TossDecision.Bat,
         matchDate: String = "2026-05-25",
@@ -99,7 +156,8 @@ class CreateMatchSetupUseCaseTest {
         return MatchSetupDraft(
             teamAName = teamAName,
             teamBName = teamBName,
-            scheduledOvers = scheduledOvers,
+            scheduleType = scheduleType,
+            scheduleAmount = scheduleAmount,
             tossWinner = tossWinner,
             tossDecision = tossDecision,
             matchDate = matchDate,
