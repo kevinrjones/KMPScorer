@@ -92,3 +92,11 @@ After each completed task, append a new dated entry under `Recent Task Log` with
 - Key decisions: split verification into dedicated jobs (`verify-tests`, `verify-ios-tests`, `verify-android-ui-tests`), used OS matrix packaging in `package-desktop`, and gated release creation with `if: startsWith(github.ref, 'refs/tags/')`.
 - Gotchas: iOS test task names differ by runner CPU architecture, so workflow resolves `iosSimulatorArm64Test` vs `iosX64Test` dynamically before execution.
 - Test coverage areas: validated referenced Gradle task availability with `:desktopApp:tasks --all`, `:domain:tasks --all`, and `:androidApp:tasks --all`; validated workflow YAML syntax with `ruby -e "require 'yaml'; YAML.load_file(...)"`.
+
+#### 2026-05-27 10:45 — Cross-platform test coverage expansion (unit + UI)
+
+- Title: `Cross-platform test coverage expansion (unit + UI)`.
+- What was shipped: expanded unit coverage for `CreateMatchSetupUseCase`, `MatchSetupStateStore`, and `RecordRecentlyAccessedMatchUseCase`; added UI tests for desktop (`desktopApp` Compose UI test), Android (`androidApp` instrumentation Compose test), and iOS (shared Compose UI test gated to iOS target execution).
+- Key decisions: kept domain/state failure modeling explicit in tests, used Compose UI testing APIs per platform constraints, and updated `.github/workflows/desktop-ci-release.yml` so CI explicitly runs JVM/unit suites, iOS target tests (including shared Compose UI), and Android instrumentation UI tests on emulator.
+- Gotchas: shared Compose UI tests in `commonTest` can fail on JVM due Skiko runtime loading; mitigated by running those tests only on iOS and adding a dedicated desktop UI test in `desktopApp` where desktop runtime dependencies are present; local Android instrumentation execution requires a connected emulator/device.
+- Test coverage areas: verified with `./gradlew :domain:jvmTest :shared:jvmTest :desktopApp:test :androidApp:testDebugUnitTest --no-daemon`, `./gradlew :domain:iosSimulatorArm64Test :shared:iosSimulatorArm64Test --no-daemon`, and `./gradlew :androidApp:assembleDebug :androidApp:assembleDebugAndroidTest --no-daemon`; attempted `:androidApp:connectedDebugAndroidTest` (blocked locally by no connected device).

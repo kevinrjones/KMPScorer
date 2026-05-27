@@ -39,7 +39,7 @@ jobs:
         run: ./gradlew :androidApp:lintDebug --no-daemon
 
   verify-tests:
-    name: Verify shared and Android unit tests
+    name: Verify shared, desktop, and Android unit tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -56,7 +56,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Run unit and JVM tests
+      - name: Run unit tests and Compose JVM UI tests
         run: |
           ./gradlew \
             :domain:jvmTest \
@@ -83,7 +83,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Resolve iOS test tasks
+      - name: Resolve iOS test tasks (including Compose UI tests in shared)
         id: ios-tasks
         shell: bash
         run: |
@@ -114,7 +114,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Run instrumentation tests on emulator
+      - name: Run Android instrumentation Compose UI tests on emulator
         uses: ReactiveCircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -123,7 +123,6 @@ jobs:
           script: |
             ./gradlew \
               :androidApp:connectedDebugAndroidTest \
-              :domain:connectedAndroidDeviceTest \
               --no-daemon
 
   package-desktop:

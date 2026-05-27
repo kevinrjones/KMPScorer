@@ -87,6 +87,7 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.compose.ui.test)
         }
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)

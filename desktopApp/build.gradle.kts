@@ -19,6 +19,11 @@ kotlin {
     }
 }
 
+dependencies {
+    testImplementation(libs.kotlin.testJunit)
+    testImplementation(libs.compose.ui.test)
+}
+
 compose.desktop {
     application {
         mainClass = "cricket.knowledgespike.scorer.MainKt"
