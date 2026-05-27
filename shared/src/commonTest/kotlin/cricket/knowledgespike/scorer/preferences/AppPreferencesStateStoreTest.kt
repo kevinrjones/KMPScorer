@@ -3,6 +3,8 @@ package cricket.knowledgespike.scorer.preferences
 import arrow.core.Either
 import arrow.core.right
 import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetup
+import cricket.knowledgespike.scorer.domain.matchsetup.MatchSchedule
+import cricket.knowledgespike.scorer.domain.matchsetup.MatchScheduleType
 import cricket.knowledgespike.scorer.domain.matchsetup.TossDecision
 import cricket.knowledgespike.scorer.domain.matchsetup.TossWinner
 import cricket.knowledgespike.scorer.domain.preferences.AppPreferences
@@ -79,7 +81,10 @@ private fun matchSetup(teamAName: String, teamBName: String): MatchSetup {
     return MatchSetup(
         teamAName = teamAName,
         teamBName = teamBName,
-        scheduledOvers = 20,
+        schedule = MatchSchedule(
+            type = MatchScheduleType.Overs,
+            amount = 20,
+        ),
         tossWinner = TossWinner.TeamA,
         tossDecision = TossDecision.Bat,
         matchDate = LocalDate.parse("2026-05-26"),

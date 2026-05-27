@@ -8,7 +8,8 @@ import kotlinx.datetime.LocalDate
 data class MatchSetupDraft(
     val teamAName: String,
     val teamBName: String,
-    val scheduledOvers: String,
+    val scheduleType: MatchScheduleType,
+    val scheduleAmount: String,
     val tossWinner: TossWinner?,
     val tossDecision: TossDecision?,
     val matchDate: String,
@@ -21,7 +22,7 @@ data class MatchSetupDraft(
 data class MatchSetup(
     val teamAName: String,
     val teamBName: String,
-    val scheduledOvers: Int,
+    val schedule: MatchSchedule,
     val tossWinner: TossWinner,
     val tossDecision: TossDecision,
     val matchDate: LocalDate,
@@ -41,11 +42,22 @@ enum class TossDecision {
     Bowl,
 }
 
+enum class MatchScheduleType {
+    Overs,
+    Balls,
+    Days,
+}
+
+data class MatchSchedule(
+    val type: MatchScheduleType,
+    val amount: Int,
+)
+
 sealed interface MatchSetupValidationError {
     data object MissingTeamAName : MatchSetupValidationError
     data object MissingTeamBName : MatchSetupValidationError
     data object TeamNamesMustDiffer : MatchSetupValidationError
-    data object InvalidScheduledOvers : MatchSetupValidationError
+    data object InvalidScheduleAmount : MatchSetupValidationError
     data object MissingTossWinner : MatchSetupValidationError
     data object MissingTossDecision : MatchSetupValidationError
     data object InvalidMatchDate : MatchSetupValidationError
@@ -68,9 +80,9 @@ class CreateMatchSetupUseCase {
             return MatchSetupValidationError.TeamNamesMustDiffer.left()
         }
 
-        val parsedOvers = draft.scheduledOvers.trim().toIntOrNull()
-        if (parsedOvers == null || parsedOvers <= 0) {
-            return MatchSetupValidationError.InvalidScheduledOvers.left()
+        val parsedScheduleAmount = draft.scheduleAmount.trim().toIntOrNull()
+        if (parsedScheduleAmount == null || parsedScheduleAmount <= 0 || parsedScheduleAmount > 999) {
+            return MatchSetupValidationError.InvalidScheduleAmount.left()
         }
 
         val tossWinner = draft.tossWinner ?: return MatchSetupValidationError.MissingTossWinner.left()
@@ -81,7 +93,10 @@ class CreateMatchSetupUseCase {
         return MatchSetup(
             teamAName = trimmedTeamAName,
             teamBName = trimmedTeamBName,
-            scheduledOvers = parsedOvers,
+            schedule = MatchSchedule(
+                type = draft.scheduleType,
+                amount = parsedScheduleAmount,
+            ),
             tossWinner = tossWinner,
             tossDecision = tossDecision,
             matchDate = parsedMatchDate,
