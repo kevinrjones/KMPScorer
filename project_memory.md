@@ -52,3 +52,51 @@ After each completed task, append a new dated entry under `Recent Task Log` with
 - Updated in-repo references that previously pointed at numeric-only sprint filenames so document pointers remain accurate after the rename.
 - Why: improve discoverability and readability of sprint documents while preserving sprint-number ordering.
 - Verification: confirmed no remaining references to legacy `SPRINT_[N].md` names via repository markdown scan and reviewed scoped `git status` output.
+
+#### 2026-05-26 11:55 — Desktop window default size and position update
+
+- Title: `Desktop window default size and position update`.
+- What was shipped: updated desktop app startup window defaults to open at `1200dp x 800dp` and centered on screen.
+- Key decisions: configured `Window` with `rememberWindowState(width = 1200.dp, height = 800.dp, position = WindowPosition(Alignment.Center))` in `desktopApp/src/main/kotlin/cricket/knowledgespike/scorer/main.kt`.
+- Gotchas: desktop window sizing/positioning uses Compose window state APIs and `dp` units rather than raw pixel primitives.
+- Test coverage areas: no tests added or run for this task (UI startup default configuration change only).
+
+#### 2026-05-26 20:56 — Cross-platform JSON preferences + MRU persistence
+
+- Title: `Cross-platform JSON preferences + MRU persistence`.
+- What was shipped: added a preferences domain model/repository, JSON-backed file persistence, desktop window state persistence, persisted theme selection, and MRU tracking for recently started matches across Android/iOS/Desktop app sessions.
+- Key decisions: used `PreferencesRepository` with Arrow `Either` failures, `OkioPreferencesStorageDataSource` for multiplatform file I/O, `AppPreferencesStateStore` for immutable state updates, and hooked MRU writes from `MatchSetupStateStore` on successful `StartMatchRequested`.
+- Gotchas: `shared` had to expose `:domain` as `api` because shared public APIs surface domain preference types; desktop window position restoration required local nullable snapshots to avoid cross-module smart-cast issues.
+- Test coverage areas: added `JsonPreferencesRepositoryTest` and `AppPreferencesStateStoreTest`; verified with `./gradlew :shared:jvmTest --no-daemon`, `./gradlew :desktopApp:compileKotlin --no-daemon`, and `./gradlew :androidApp:compileDebugSources --no-daemon`.
+
+#### 2026-05-27 08:12 — Recap log update in `docs/RECAP.md`
+
+- Title: `Recap log update in docs/RECAP.md`.
+- What was shipped: appended a new `2026-05-27 08:08` recap entry at the end of `docs/RECAP.md` summarizing work completed since the prior recap, including preferences persistence and MRU tracking delivery context.
+- Key decisions: kept recap entries strictly chronological by appending to file end, used the provided local session time for heading accuracy, and included relevant commit references (`0be6130`, `3dd4668`) plus current uncommitted work status.
+- Gotchas: recap quality depends on combining repository commit history with in-session uncommitted changes to avoid missing latest delivered work.
+- Test coverage areas: no automated tests run (documentation-only update).
+
+#### 2026-05-27 09:35 — Root README overhaul and screenshot placeholders
+
+- Title: `Comprehensive README refresh with screenshot placeholders`.
+- What was shipped: replaced the root `README.md` with a full project overview including professional badges (Kotlin, Compose for Desktop, License), core feature highlights, clearer module structure, and explicit getting started/run/build instructions for Android, Desktop, and iOS.
+- Key decisions: used a `License: TBD` badge because no top-level `LICENSE` file currently exists, and created `docs/images/screenshots/README.md` to define named screenshot placeholders with capture guidance.
+- Gotchas: `docs/images/screenshots` did not previously exist, so directory documentation had to be created alongside README references to avoid ambiguous screenshot naming.
+- Test coverage areas: no automated tests run (documentation-only update).
+
+#### 2026-05-27 09:40 — GitHub Actions CI + cross-platform desktop release automation
+
+- Title: `Cross-platform desktop CI packaging and tag-gated release workflow`.
+- What was shipped: added `.github/workflows/desktop-ci-release.yml` to run tests (JVM/unit, iOS target tests, Android instrumentation/UI tests on emulator), build native desktop packages for Linux (`.deb`), macOS (`.dmg`), and Windows (`.msi`), upload artifacts, and publish a GitHub Release only on tag pushes.
+- Key decisions: split verification into dedicated jobs (`verify-tests`, `verify-ios-tests`, `verify-android-ui-tests`), used OS matrix packaging in `package-desktop`, and gated release creation with `if: startsWith(github.ref, 'refs/tags/')`.
+- Gotchas: iOS test task names differ by runner CPU architecture, so workflow resolves `iosSimulatorArm64Test` vs `iosX64Test` dynamically before execution.
+- Test coverage areas: validated referenced Gradle task availability with `:desktopApp:tasks --all`, `:domain:tasks --all`, and `:androidApp:tasks --all`; validated workflow YAML syntax with `ruby -e "require 'yaml'; YAML.load_file(...)"`.
+
+#### 2026-05-27 10:45 — Cross-platform test coverage expansion (unit + UI)
+
+- Title: `Cross-platform test coverage expansion (unit + UI)`.
+- What was shipped: expanded unit coverage for `CreateMatchSetupUseCase`, `MatchSetupStateStore`, and `RecordRecentlyAccessedMatchUseCase`; added UI tests for desktop (`desktopApp` Compose UI test), Android (`androidApp` instrumentation Compose test), and iOS (shared Compose UI test gated to iOS target execution).
+- Key decisions: kept domain/state failure modeling explicit in tests, used Compose UI testing APIs per platform constraints, and updated `.github/workflows/desktop-ci-release.yml` so CI explicitly runs JVM/unit suites, iOS target tests (including shared Compose UI), and Android instrumentation UI tests on emulator.
+- Gotchas: shared Compose UI tests in `commonTest` can fail on JVM due Skiko runtime loading; mitigated by running those tests only on iOS and adding a dedicated desktop UI test in `desktopApp` where desktop runtime dependencies are present; local Android instrumentation execution requires a connected emulator/device.
+- Test coverage areas: verified with `./gradlew :domain:jvmTest :shared:jvmTest :desktopApp:test :androidApp:testDebugUnitTest --no-daemon`, `./gradlew :domain:iosSimulatorArm64Test :shared:iosSimulatorArm64Test --no-daemon`, and `./gradlew :androidApp:assembleDebug :androidApp:assembleDebugAndroidTest --no-daemon`; attempted `:androidApp:connectedDebugAndroidTest` (blocked locally by no connected device).

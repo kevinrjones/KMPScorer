@@ -65,6 +65,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.jetbrains.compose.navigation)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.okio)
             implementation(libs.kotlinx.datetime)
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqlite.bundled)
@@ -80,12 +81,13 @@ kotlin {
 
             implementation(libs.arrow.core)
 
-            implementation(project(":domain")) // The name matches the folder name
+            api(project(":domain")) // The name matches the folder name
 
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.compose.ui.test)
         }
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)

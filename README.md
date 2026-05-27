@@ -1,60 +1,101 @@
-This is a Kotlin Multiplatform project targeting Android, iOS, Desktop (JVM).
+# KMPScorer
 
-* [/shared](./shared/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./shared/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./shared/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./shared/src/jvmMain/kotlin)
-    folder is the appropriate location.
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.21-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org/)
+[![Compose for Desktop](https://img.shields.io/badge/Compose%20for%20Desktop-1.9.0-4285F4?logo=jetbrains&logoColor=white)](https://www.jetbrains.com/lp/compose-multiplatform/)
+[![License](https://img.shields.io/badge/License-TBD-lightgrey)](./LICENSE)
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+`KMPScorer` is a Kotlin Multiplatform cricket scoring app targeting Android, iOS, and Desktop (JVM), with shared domain and UI logic built using Compose Multiplatform.
 
-### Build and Run Android Application
+## Core Features
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :androidApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :androidApp:assembleDebug
-  ```
+- **Cross-platform match setup flow** with required start-gate validation (teams, overs, toss winner/decision, match date).
+- **Optional match metadata capture** (venue, umpires, weather) for richer setup context.
+- **Adaptive UI behavior** driven by `WindowWidthSizeClass` for mobile and desktop layouts.
+- **Cross-session preferences persistence** for active theme selection and desktop window size/position.
+- **MRU history tracking** for recently accessed matches.
+- **Desktop-native workflow support** including menu entry (`Match -> New Match Setup`) and persisted window restore.
 
-### Build and Run Desktop (JVM) Application
+## Project Structure
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :desktopApp:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :desktopApp:run
-  ```
+- [`domain`](./domain): platform-neutral domain models/use-cases.
+- [`shared`](./shared): shared Compose UI, state stores, navigation, and cross-platform logic.
+  - [`commonMain`](./shared/src/commonMain/kotlin): common Kotlin sources.
+  - Platform-specific source sets (`androidMain`, `iosMain`, `jvmMain`) for target-specific integration points.
+- [`androidApp`](./androidApp): Android application entry point.
+- [`iosApp`](./iosApp): iOS host application (Xcode project).
+- [`desktopApp`](./desktopApp): Desktop JVM entry point and packaging.
 
-### Build and Run iOS Application
+## Screenshots
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+Screenshot placeholders are defined under [`docs/images/screenshots`](./docs/images/screenshots).
 
----
+| Placeholder file | Description |
+| --- | --- |
+| `android-match-setup.png` | Android Match Setup screen showing required and optional sections. |
+| `desktop-match-setup.png` | Desktop Match Setup screen in expanded layout. |
+| `desktop-theme-menu.png` | Desktop menu with theme preference options (`System`, `Light`, `Dark`). |
+| `desktop-window-restore.png` | Desktop app restored to previously saved window size and position. |
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+See [`docs/images/screenshots/README.md`](./docs/images/screenshots/README.md) for capture notes.
 
-### Match Setup Feature
+## Getting Started
 
-The shared app now includes a `Match Setup` flow with:
-- Required start gate fields: Team A, Team B, scheduled overs, toss winner, toss decision, and match date (`YYYY-MM-DD`)
-- Optional metadata fields: venue, umpire one, umpire two, and weather
-- Desktop access via both visible screen actions and a `Match -> New Match Setup` menu entry
+### Prerequisites
 
-### Domain Documentation
+- JDK 17+ (recommended for modern Android Gradle Plugin tooling).
+- macOS, Linux, or Windows.
+- One of:
+  - Android Studio or IntelliJ IDEA for Android/Desktop development.
+  - Xcode (macOS only) for iOS builds.
 
-- Language and domain glossary: [`CONTEXT.md`](./CONTEXT.md)
-- Decision record for setup validation boundary: [`docs/adr/0001-core-start-gate-for-match-setup.md`](./docs/adr/0001-core-start-gate-for-match-setup.md)
+### Clone and sync
+
+```bash
+git clone <your-repo-url>
+cd KMPScorer
+./gradlew --version
+```
+
+On Windows, use `gradlew.bat` instead of `./gradlew`.
+
+### Run the Desktop app
+
+```bash
+./gradlew :desktopApp:run
+```
+
+### Build the Android app
+
+```bash
+./gradlew :androidApp:assembleDebug
+```
+
+To install/run on a connected device or emulator, use your IDE run configuration for `androidApp`.
+
+### Run the iOS app
+
+1. Open [`iosApp`](./iosApp) in Xcode.
+2. Select a simulator/device.
+3. Run the `iosApp` target.
+
+### Build all major targets
+
+```bash
+./gradlew :shared:assemble :desktopApp:assemble :androidApp:assembleDebug
+```
+
+### Optional verification checks
+
+```bash
+./gradlew :shared:jvmTest :desktopApp:compileKotlin :androidApp:compileDebugSources
+```
+
+## Documentation
+
+- Domain glossary and language context: [`CONTEXT.md`](./CONTEXT.md)
+- Feature review and roadmap context: [`docs/FEATURES.md`](./docs/FEATURES.md)
+- Architecture decision record for setup validation boundary: [`docs/adr/0001-core-start-gate-for-match-setup.md`](./docs/adr/0001-core-start-gate-for-match-setup.md)
+
+## License
+
+License is currently marked as **TBD** in this repository. Add a top-level `LICENSE` file and update the badge/link when finalized.

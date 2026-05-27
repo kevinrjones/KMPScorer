@@ -1,0 +1,211 @@
+name: Desktop CI and Release
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - "**"
+    tags:
+      - "*"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: "17"
+
+jobs:
+  lint:
+    name: Run Android Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Run Lint
+        run: ./gradlew :androidApp:lintDebug --no-daemon
+
+  verify-tests:
+    name: Verify shared, desktop, and Android unit tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Run unit tests and Compose JVM UI tests
+        run: |
+          ./gradlew \
+            :domain:jvmTest \
+            :shared:jvmTest \
+            :desktopApp:test \
+            :androidApp:testDebugUnitTest \
+            --no-daemon
+
+  verify-ios-tests:
+    name: Verify iOS target tests
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Resolve iOS test tasks (including Compose UI tests in shared)
+        id: ios-tasks
+        shell: bash
+        run: |
+          if [[ "$(uname -m)" == "arm64" ]]; then
+            echo "tasks=:domain:iosSimulatorArm64Test :shared:iosSimulatorArm64Test" >> "$GITHUB_OUTPUT"
+          else
+            echo "tasks=:domain:iosX64Test :shared:iosX64Test" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run iOS tests
+        run: ./gradlew ${{ steps.ios-tasks.outputs.tasks }} --no-daemon
+
+  verify-android-ui-tests:
+    name: Verify Android UI tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Run Android instrumentation Compose UI tests on emulator
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          script: |
+            ./gradlew \
+              :androidApp:connectedDebugAndroidTest \
+              --no-daemon
+
+  package-desktop:
+    name: Package desktop for ${{ matrix.os }}
+    needs:
+      - lint
+      - verify-tests
+      - verify-ios-tests
+      - verify-android-ui-tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            package_task: :desktopApp:packageReleaseDeb
+            artifact_name: desktop-package-linux
+            artifact_glob: desktopApp/build/compose/binaries/main-release/deb/*.deb
+          - os: macos-latest
+            package_task: :desktopApp:packageReleaseDmg
+            artifact_name: desktop-package-macos
+            artifact_glob: desktopApp/build/compose/binaries/main-release/dmg/*.dmg
+          - os: windows-latest
+            package_task: :desktopApp:packageReleaseMsi
+            artifact_name: desktop-package-windows
+            artifact_glob: desktopApp/build/compose/binaries/main-release/msi/*.msi
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Resolve Gradle wrapper command
+        id: gradlew
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            echo "cmd=./gradlew.bat" >> "$GITHUB_OUTPUT"
+          else
+            echo "cmd=./gradlew" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build native desktop package
+        shell: bash
+        run: ${{ steps.gradlew.outputs.cmd }} ${{ matrix.package_task }} --no-daemon
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_glob }}
+          if-no-files-found: error
+
+  release:
+    name: Create GitHub release for tag
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - package-desktop
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download desktop artifacts
+        uses: actions/download-artifact@v8
+        with:
+          pattern: desktop-package-*
+          path: release-artifacts
+          merge-multiple: true
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v3
+        with:
+          generate_release_notes: true
+          files: |
+            release-artifacts/**/*.deb
+            release-artifacts/**/*.dmg
+            release-artifacts/**/*.msi
