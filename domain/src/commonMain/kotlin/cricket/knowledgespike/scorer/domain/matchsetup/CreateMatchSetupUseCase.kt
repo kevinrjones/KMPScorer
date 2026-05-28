@@ -66,50 +66,111 @@ sealed interface MatchSetupValidationError {
 class CreateMatchSetupUseCase {
 
     operator fun invoke(draft: MatchSetupDraft): Either<MatchSetupValidationError, MatchSetup> {
-        val trimmedTeamAName = draft.teamAName.trim()
-        if (trimmedTeamAName.isBlank()) {
-            return MatchSetupValidationError.MissingTeamAName.left()
+        val normalizedDraft = draft.toNormalizedDraft(::parseMatchDate)
+        val validationError = normalizedDraft.firstValidationError()
+        if (validationError != null) {
+            return validationError.left()
         }
 
-        val trimmedTeamBName = draft.teamBName.trim()
-        if (trimmedTeamBName.isBlank()) {
-            return MatchSetupValidationError.MissingTeamBName.left()
-        }
-
-        if (trimmedTeamAName.equals(trimmedTeamBName, ignoreCase = true)) {
-            return MatchSetupValidationError.TeamNamesMustDiffer.left()
-        }
-
-        val parsedScheduleAmount = draft.scheduleAmount.trim().toIntOrNull()
-        if (parsedScheduleAmount == null || parsedScheduleAmount <= 0 || parsedScheduleAmount > 999) {
-            return MatchSetupValidationError.InvalidScheduleAmount.left()
-        }
-
-        val tossWinner = draft.tossWinner ?: return MatchSetupValidationError.MissingTossWinner.left()
-        val tossDecision = draft.tossDecision ?: return MatchSetupValidationError.MissingTossDecision.left()
-
-        val parsedMatchDate = parseMatchDate(draft.matchDate) ?: return MatchSetupValidationError.InvalidMatchDate.left()
-
-        return MatchSetup(
-            teamAName = trimmedTeamAName,
-            teamBName = trimmedTeamBName,
-            schedule = MatchSchedule(
-                type = draft.scheduleType,
-                amount = parsedScheduleAmount,
-            ),
-            tossWinner = tossWinner,
-            tossDecision = tossDecision,
-            matchDate = parsedMatchDate,
-            venue = draft.venue.normalizedOrNull(),
-            umpireOne = draft.umpireOne.normalizedOrNull(),
-            umpireTwo = draft.umpireTwo.normalizedOrNull(),
-            weather = draft.weather.normalizedOrNull(),
-        ).right()
+        return normalizedDraft.toMatchSetup().right()
     }
 
     private fun parseMatchDate(rawValue: String): LocalDate? {
         return runCatching { LocalDate.parse(rawValue.trim()) }.getOrNull()
     }
+}
+
+private data class NormalizedMatchSetupDraft(
+    val teamAName: String,
+    val teamBName: String,
+    val scheduleType: MatchScheduleType,
+    val scheduleAmount: Int?,
+    val tossWinner: TossWinner?,
+    val tossDecision: TossDecision?,
+    val matchDate: LocalDate?,
+    val venue: String?,
+    val umpireOne: String?,
+    val umpireTwo: String?,
+    val weather: String?,
+)
+
+private data class MatchSetupValidationRule(
+    val error: MatchSetupValidationError,
+    val isInvalid: (NormalizedMatchSetupDraft) -> Boolean,
+)
+
+private val matchSetupValidationRules = listOf(
+    MatchSetupValidationRule(
+        error = MatchSetupValidationError.MissingTeamAName,
+        isInvalid = { it.teamAName.isBlank() },
+    ),
+    MatchSetupValidationRule(
+        error = MatchSetupValidationError.MissingTeamBName,
+        isInvalid = { it.teamBName.isBlank() },
+    ),
+    MatchSetupValidationRule(
+        error = MatchSetupValidationError.TeamNamesMustDiffer,
+        isInvalid = { it.teamAName.equals(it.teamBName, ignoreCase = true) },
+    ),
+    MatchSetupValidationRule(
+        error = MatchSetupValidationError.InvalidScheduleAmount,
+        isInvalid = { scheduleDraft ->
+            val scheduleAmount = scheduleDraft.scheduleAmount
+            scheduleAmount == null || scheduleAmount <= 0 || scheduleAmount > 999
+        },
+    ),
+    MatchSetupValidationRule(
+        error = MatchSetupValidationError.MissingTossWinner,
+        isInvalid = { it.tossWinner == null },
+    ),
+    MatchSetupValidationRule(
+        error = MatchSetupValidationError.MissingTossDecision,
+        isInvalid = { it.tossDecision == null },
+    ),
+    MatchSetupValidationRule(
+        error = MatchSetupValidationError.InvalidMatchDate,
+        isInvalid = { it.matchDate == null },
+    ),
+)
+
+private fun MatchSetupDraft.toNormalizedDraft(parseDate: (String) -> LocalDate?): NormalizedMatchSetupDraft {
+    return NormalizedMatchSetupDraft(
+        teamAName = teamAName.trim(),
+        teamBName = teamBName.trim(),
+        scheduleType = scheduleType,
+        scheduleAmount = scheduleAmount.trim().toIntOrNull(),
+        tossWinner = tossWinner,
+        tossDecision = tossDecision,
+        matchDate = parseDate(matchDate),
+        venue = venue.normalizedOrNull(),
+        umpireOne = umpireOne.normalizedOrNull(),
+        umpireTwo = umpireTwo.normalizedOrNull(),
+        weather = weather.normalizedOrNull(),
+    )
+}
+
+private fun NormalizedMatchSetupDraft.firstValidationError(): MatchSetupValidationError? {
+    return matchSetupValidationRules
+        .firstOrNull { rule -> rule.isInvalid(this) }
+        ?.error
+}
+
+private fun NormalizedMatchSetupDraft.toMatchSetup(): MatchSetup {
+    return MatchSetup(
+        teamAName = teamAName,
+        teamBName = teamBName,
+        schedule = MatchSchedule(
+            type = scheduleType,
+            amount = requireNotNull(scheduleAmount) { "Schedule amount must be validated before creation" },
+        ),
+        tossWinner = requireNotNull(tossWinner) { "Toss winner must be validated before creation" },
+        tossDecision = requireNotNull(tossDecision) { "Toss decision must be validated before creation" },
+        matchDate = requireNotNull(matchDate) { "Match date must be validated before creation" },
+        venue = venue,
+        umpireOne = umpireOne,
+        umpireTwo = umpireTwo,
+        weather = weather,
+    )
 }
 
 private fun String.normalizedOrNull(): String? =

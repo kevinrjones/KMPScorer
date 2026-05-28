@@ -501,7 +501,7 @@ private fun TossWinnerSection(
             .testTag(TossWinnerGroupTag)
             .selectableGroup()
             .onPreviewKeyEvent { event ->
-                handleChoiceSectionDirectionalKey(
+                dispatchChoiceSectionDirectionalKeyEvent(
                     event = event,
                     selectedValue = selectedValue,
                     options = options,
@@ -570,7 +570,7 @@ private fun TossDecisionSection(
             .testTag(TossDecisionGroupTag)
             .selectableGroup()
             .onPreviewKeyEvent { event ->
-                handleChoiceSectionDirectionalKey(
+                dispatchChoiceSectionDirectionalKeyEvent(
                     event = event,
                     selectedValue = selectedValue,
                     options = options,
@@ -668,26 +668,18 @@ private fun RadioOption(
     }
 }
 
-private fun <T> handleChoiceSectionDirectionalKey(
+private fun <T> dispatchChoiceSectionDirectionalKeyEvent(
     event: KeyEvent,
     selectedValue: T?,
     options: List<T>,
     onSelect: (T) -> Unit,
     onDirectionalFocusOption: (T) -> Unit,
 ): Boolean {
-    if (event.type != KeyEventType.KeyDown) {
-        return false
-    }
-
-    val direction = when (event.key) {
-        Key.DirectionDown, Key.DirectionRight -> 1
-        Key.DirectionUp, Key.DirectionLeft -> -1
-        else -> return false
-    }
-
-    val nextOption = options.nextDirectionalOption(
+    val directionStep = event.toDirectionalStep() ?: return false
+    val nextOption = calculateNextFocusedOption(
+        options = options,
         selectedValue = selectedValue,
-        direction = direction,
+        directionStep = directionStep,
     ) ?: return false
 
     if (nextOption != selectedValue) {
@@ -697,21 +689,16 @@ private fun <T> handleChoiceSectionDirectionalKey(
     return true
 }
 
-private fun <T> List<T>.nextDirectionalOption(
-    selectedValue: T?,
-    direction: Int,
-): T? {
-    if (isEmpty()) {
+private fun KeyEvent.toDirectionalStep(): Int? {
+    if (type != KeyEventType.KeyDown) {
         return null
     }
 
-    val selectedIndex = indexOf(selectedValue)
-    if (selectedIndex < 0) {
-        return if (direction > 0) first() else last()
+    return when (key) {
+        Key.DirectionDown, Key.DirectionRight -> 1
+        Key.DirectionUp, Key.DirectionLeft -> -1
+        else -> null
     }
-
-    val nextIndex = (selectedIndex + direction).coerceIn(0, lastIndex)
-    return get(nextIndex)
 }
 
 @Composable

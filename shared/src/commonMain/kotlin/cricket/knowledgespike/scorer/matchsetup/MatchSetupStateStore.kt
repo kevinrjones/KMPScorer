@@ -42,92 +42,98 @@ fun reduceMatchSetupScreenState(
     createMatchSetupUseCase: CreateMatchSetupUseCase,
 ): MatchSetupScreenState {
     return when (event) {
-        is MatchSetupScreenEvent.TeamANameChanged -> {
-            currentState.withUpdatedForm {
-                copy(teamAName = event.value)
-            }.evaluatingStartGateWith(createMatchSetupUseCase)
-        }
+        is MatchSetupScreenEvent.TeamANameChanged,
+        is MatchSetupScreenEvent.TeamBNameChanged,
+        is MatchSetupScreenEvent.ScheduleTypeChanged,
+        is MatchSetupScreenEvent.ScheduleAmountChanged,
+        is MatchSetupScreenEvent.MatchDateChanged,
+        -> currentState.reduceCoreInfoEvent(event, createMatchSetupUseCase)
 
-        is MatchSetupScreenEvent.TeamBNameChanged -> {
-            currentState.withUpdatedForm {
-                copy(teamBName = event.value)
-            }.evaluatingStartGateWith(createMatchSetupUseCase)
-        }
+        is MatchSetupScreenEvent.TossWinnerChanged,
+        is MatchSetupScreenEvent.TossDecisionChanged,
+        -> currentState.reduceTossDetailsEvent(event, createMatchSetupUseCase)
 
-        is MatchSetupScreenEvent.ScheduleTypeChanged -> {
-            currentState.withUpdatedForm {
-                copy(scheduleType = event.value)
-            }.evaluatingStartGateWith(createMatchSetupUseCase)
-        }
+        is MatchSetupScreenEvent.VenueChanged,
+        is MatchSetupScreenEvent.UmpireOneChanged,
+        is MatchSetupScreenEvent.UmpireTwoChanged,
+        is MatchSetupScreenEvent.WeatherChanged,
+        -> currentState.reduceOptionalMetadataEvent(event, createMatchSetupUseCase)
 
-        is MatchSetupScreenEvent.ScheduleAmountChanged -> {
-            currentState.withUpdatedForm {
-                copy(scheduleAmount = event.value)
-            }.evaluatingStartGateWith(createMatchSetupUseCase)
-        }
-
-        is MatchSetupScreenEvent.TossWinnerChanged -> {
-            currentState.withUpdatedForm {
-                copy(tossWinner = event.value)
-            }.evaluatingStartGateWith(createMatchSetupUseCase)
-        }
-
-        is MatchSetupScreenEvent.TossDecisionChanged -> {
-            currentState.withUpdatedForm {
-                copy(tossDecision = event.value)
-            }.evaluatingStartGateWith(createMatchSetupUseCase)
-        }
-
-        is MatchSetupScreenEvent.MatchDateChanged -> {
-            currentState.withUpdatedForm {
-                copy(matchDate = event.value)
-            }.evaluatingStartGateWith(createMatchSetupUseCase)
-        }
-
-        is MatchSetupScreenEvent.VenueChanged -> {
-            currentState.withUpdatedForm {
-                copy(venue = event.value)
-            }.evaluatingStartGateWith(createMatchSetupUseCase)
-        }
-
-        is MatchSetupScreenEvent.UmpireOneChanged -> {
-            currentState.withUpdatedForm {
-                copy(umpireOne = event.value)
-            }.evaluatingStartGateWith(createMatchSetupUseCase)
-        }
-
-        is MatchSetupScreenEvent.UmpireTwoChanged -> {
-            currentState.withUpdatedForm {
-                copy(umpireTwo = event.value)
-            }.evaluatingStartGateWith(createMatchSetupUseCase)
-        }
-
-        is MatchSetupScreenEvent.WeatherChanged -> {
-            currentState.withUpdatedForm {
-                copy(weather = event.value)
-            }.evaluatingStartGateWith(createMatchSetupUseCase)
-        }
-
-        MatchSetupScreenEvent.StartMatchRequested -> {
-            val createMatchSetupResult = createMatchSetupUseCase(currentState.formState.toMatchSetupDraft())
-            createMatchSetupResult.fold(
-                ifLeft = { validationError ->
-                    currentState.copy(
-                        canStartMatch = false,
-                        startMatchResult = MatchSetupStartMatchResult.ValidationError(validationError.toUiMessage()),
-                    )
-                },
-                ifRight = { setup ->
-                    currentState.copy(
-                        canStartMatch = true,
-                        startMatchResult = MatchSetupStartMatchResult.Ready(setup),
-                    )
-                },
-            )
-        }
+        MatchSetupScreenEvent.StartMatchRequested -> currentState.reduceStartMatchRequested(createMatchSetupUseCase)
 
         MatchSetupScreenEvent.ResetRequested -> MatchSetupScreenState()
     }
+}
+
+private fun MatchSetupScreenState.reduceCoreInfoEvent(
+    event: MatchSetupScreenEvent,
+    createMatchSetupUseCase: CreateMatchSetupUseCase,
+): MatchSetupScreenState {
+    return reduceFormEvent(createMatchSetupUseCase) {
+        when (event) {
+            is MatchSetupScreenEvent.TeamANameChanged -> copy(teamAName = event.value)
+            is MatchSetupScreenEvent.TeamBNameChanged -> copy(teamBName = event.value)
+            is MatchSetupScreenEvent.ScheduleTypeChanged -> copy(scheduleType = event.value)
+            is MatchSetupScreenEvent.ScheduleAmountChanged -> copy(scheduleAmount = event.value)
+            is MatchSetupScreenEvent.MatchDateChanged -> copy(matchDate = event.value)
+            else -> this
+        }
+    }
+}
+
+private fun MatchSetupScreenState.reduceTossDetailsEvent(
+    event: MatchSetupScreenEvent,
+    createMatchSetupUseCase: CreateMatchSetupUseCase,
+): MatchSetupScreenState {
+    return reduceFormEvent(createMatchSetupUseCase) {
+        when (event) {
+            is MatchSetupScreenEvent.TossWinnerChanged -> copy(tossWinner = event.value)
+            is MatchSetupScreenEvent.TossDecisionChanged -> copy(tossDecision = event.value)
+            else -> this
+        }
+    }
+}
+
+private fun MatchSetupScreenState.reduceOptionalMetadataEvent(
+    event: MatchSetupScreenEvent,
+    createMatchSetupUseCase: CreateMatchSetupUseCase,
+): MatchSetupScreenState {
+    return reduceFormEvent(createMatchSetupUseCase) {
+        when (event) {
+            is MatchSetupScreenEvent.VenueChanged -> copy(venue = event.value)
+            is MatchSetupScreenEvent.UmpireOneChanged -> copy(umpireOne = event.value)
+            is MatchSetupScreenEvent.UmpireTwoChanged -> copy(umpireTwo = event.value)
+            is MatchSetupScreenEvent.WeatherChanged -> copy(weather = event.value)
+            else -> this
+        }
+    }
+}
+
+private fun MatchSetupScreenState.reduceStartMatchRequested(
+    createMatchSetupUseCase: CreateMatchSetupUseCase,
+): MatchSetupScreenState {
+    val createMatchSetupResult = createMatchSetupUseCase(formState.toMatchSetupDraft())
+    return createMatchSetupResult.fold(
+        ifLeft = { validationError ->
+            copy(
+                canStartMatch = false,
+                startMatchResult = MatchSetupStartMatchResult.ValidationError(validationError.toUiMessage()),
+            )
+        },
+        ifRight = { setup ->
+            copy(
+                canStartMatch = true,
+                startMatchResult = MatchSetupStartMatchResult.Ready(setup),
+            )
+        },
+    )
+}
+
+private fun MatchSetupScreenState.reduceFormEvent(
+    createMatchSetupUseCase: CreateMatchSetupUseCase,
+    updateForm: MatchSetupFormState.() -> MatchSetupFormState,
+): MatchSetupScreenState {
+    return withUpdatedForm(updateForm).evaluatingStartGateWith(createMatchSetupUseCase)
 }
 
 private fun MatchSetupScreenState.withUpdatedForm(
