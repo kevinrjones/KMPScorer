@@ -29,8 +29,8 @@ class HomeStateStore(
             HomeScreenEvent.NewMatchRequested -> onRouteRequested(ScorerRoute.MatchSetupRoute)
             HomeScreenEvent.RefreshRequested -> loadMatches()
             HomeScreenEvent.DialogDismissRequested -> dismissDialog()
-            is HomeScreenEvent.EditMatchRequested -> editMatch(matchId = event.matchId)
-            is HomeScreenEvent.ScoreMatchRequested -> scoreMatch(matchId = event.matchId)
+            is HomeScreenEvent.EditMatchRequested -> editMatch()
+            is HomeScreenEvent.OpenSavedMatchRequested -> openSavedMatch(matchId = event.matchId)
             is HomeScreenEvent.DeleteMatchRequested -> showDeleteConfirmation(matchId = event.matchId)
             is HomeScreenEvent.DeleteMatchConfirmed -> deleteMatch(matchId = event.matchId)
         }
@@ -42,12 +42,12 @@ class HomeStateStore(
         }
     }
 
-    private fun editMatch(matchId: Long) {
+    private fun editMatch() {
         dismissDialog()
         onRouteRequested(ScorerRoute.MatchSetupRoute)
     }
 
-    private fun scoreMatch(matchId: Long) {
+    private fun openSavedMatch(matchId: Long) {
         dismissDialog()
         onRouteRequested(ScorerRoute.MatchSummaryRoute(matchId = matchId))
     }

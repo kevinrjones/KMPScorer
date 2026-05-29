@@ -15,6 +15,13 @@ fun buildScorecardDatabase(builder: RoomDatabase.Builder<ScorecardDatabase>): Sc
 }
 
 object ScorecardDatabaseMigrations {
+    /**
+     * Sprint 2 migration baseline contract:
+     * - Room schema starts at v1 (`ScorecardDatabaseSchemaVersion`).
+     * - This is the anchor version for all future migrations (v1 -> v2+).
+     */
+    const val BaselineSchemaVersion: Int = ScorecardDatabaseSchemaVersion
+
     val all: List<Migration> = emptyList()
 }
 

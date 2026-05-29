@@ -100,7 +100,7 @@ class HomeStateStoreTest {
     }
 
     @Test
-    fun `given inline score action when requested then route requests summary for match id`() = runTest {
+    fun `given saved match open action when requested then route requests summary for match id`() = runTest {
         var requestedRoute: ScorerRoute? = null
         val stateStore = HomeStateStore(
             matchRepository = FakeHomeMatchRepository(storedMatches = listOf(storedMatch(id = 33L))),
@@ -109,7 +109,7 @@ class HomeStateStoreTest {
         )
         testScheduler.advanceUntilIdle()
 
-        stateStore.onEvent(HomeScreenEvent.ScoreMatchRequested(matchId = 33L))
+        stateStore.onEvent(HomeScreenEvent.OpenSavedMatchRequested(matchId = 33L))
 
         assertEquals(ScorerRoute.MatchSummaryRoute(matchId = 33L), requestedRoute)
         assertEquals(HomeMatchDialogState.Hidden, stateStore.screenState.value.dialogState)

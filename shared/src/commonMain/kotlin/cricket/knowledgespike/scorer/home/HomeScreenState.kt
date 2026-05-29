@@ -31,7 +31,7 @@ sealed interface HomeScreenEvent {
     data object NewMatchRequested : HomeScreenEvent
     data object RefreshRequested : HomeScreenEvent
     data class EditMatchRequested(val matchId: Long) : HomeScreenEvent
-    data class ScoreMatchRequested(val matchId: Long) : HomeScreenEvent
+    data class OpenSavedMatchRequested(val matchId: Long) : HomeScreenEvent
     data class DeleteMatchRequested(val matchId: Long) : HomeScreenEvent
     data class DeleteMatchConfirmed(val matchId: Long) : HomeScreenEvent
     data object DialogDismissRequested : HomeScreenEvent

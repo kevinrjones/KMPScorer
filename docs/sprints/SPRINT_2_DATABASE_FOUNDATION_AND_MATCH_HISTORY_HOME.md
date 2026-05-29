@@ -89,3 +89,21 @@ and deliver a new Home entry flow backed by stored match history.
 - Home is the default route and lists persisted matches.
 - Summary opens by `matchId` in read-only mode.
 - Expected persistence failures are explicit typed outcomes (no normal-flow exceptions).
+
+## Sprint 2 completion evidence (2026-05-29)
+
+### Delivered scope
+
+- Consolidated Room schema export history to one canonical package path under `shared/schemas`.
+- Added `ScorecardDatabaseSchemaBootstrapTest` (JVM) to guard schema package/version drift against `ScorecardDatabase` configuration.
+- Documented the explicit `v1` migration baseline contract beside `ScorecardDatabaseMigrations`.
+- Updated Home saved-match interaction to open read-only summary via row tap (`matchId`) in state/store/UI flow.
+
+### Deviations
+
+- No approved deviations from Sprint 2 in-scope requirements.
+
+### Validation evidence
+
+- `./gradlew :shared:jvmTest --tests "*HomeStateStoreTest*" --tests "*HomeScreenUiTest*" --tests "*ScorecardDatabaseSchemaBootstrapTest*"`
+- `./gradlew :domain:jvmTest :androidApp:compileDebugSources :desktopApp:classes`

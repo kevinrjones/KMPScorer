@@ -5,7 +5,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.test.v2.runComposeUiTest
 import cricket.knowledgespike.scorer.getPlatform
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -66,7 +66,7 @@ class HomeScreenUiTest {
     }
 
     @Test
-    fun `given content state when score button is tapped then score event is emitted`() {
+    fun `given content state when match row is tapped then open saved match event is emitted`() {
         if (!shouldRunComposeUiTests()) return
 
         var emittedEvent: HomeScreenEvent? = null
@@ -90,10 +90,10 @@ class HomeScreenUiTest {
                 )
             }
 
-            onNodeWithTag("${HomeScoreMatchButtonTagPrefix}22").performClick()
+            onNodeWithTag("${HomeMatchRowTagPrefix}22").performClick()
         }
 
-        assertEquals(HomeScreenEvent.ScoreMatchRequested(matchId = 22L), emittedEvent)
+        assertEquals(HomeScreenEvent.OpenSavedMatchRequested(matchId = 22L), emittedEvent)
     }
 
     @Test

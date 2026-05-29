@@ -1,12 +1,12 @@
 package cricket.knowledgespike.scorer
 
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.runComposeUiTest
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.ui.test.v2.runComposeUiTest
 import cricket.knowledgespike.scorer.data.source.InMemoryMatchRepository
 import cricket.knowledgespike.scorer.domain.matchsetup.MatchSchedule
 import cricket.knowledgespike.scorer.domain.matchsetup.MatchScheduleType
@@ -14,11 +14,10 @@ import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetup
 import cricket.knowledgespike.scorer.domain.matchsetup.TossDecision
 import cricket.knowledgespike.scorer.domain.matchsetup.TossWinner
 import cricket.knowledgespike.scorer.home.HomeEditMatchButtonTagPrefix
-import cricket.knowledgespike.scorer.home.HomeScoreMatchButtonTagPrefix
+import cricket.knowledgespike.scorer.home.HomeMatchRowTagPrefix
 import cricket.knowledgespike.scorer.navigation.AppRouteStateStore
 import cricket.knowledgespike.scorer.navigation.ScorerRoute
 import kotlinx.datetime.LocalDate
-import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -127,9 +126,7 @@ class AppDesktopUiTest {
                 .fetchSemanticsNodes().isNotEmpty()
         }
 
-        runBlocking {
-            matchRepository.createMatchFromSetup(matchSetup())
-        }
+        matchRepository.createMatchFromSetup(matchSetup())
 
         runOnIdle {
             routeStateStore.showMatchSetup()
@@ -149,12 +146,10 @@ class AppDesktopUiTest {
     fun given_home_row_inline_edit_when_clicked_then_route_moves_to_match_setup() = runComposeUiTest {
         val routeStateStore = AppRouteStateStore(initialRoute = ScorerRoute.HomeRoute)
         val matchRepository = InMemoryMatchRepository()
-        val matchId = runBlocking {
-            matchRepository.createMatchFromSetup(matchSetup()).fold(
-                ifLeft = { failure -> error("Unexpected save failure: $failure") },
-                ifRight = { it.id },
-            )
-        }
+        val matchId = matchRepository.createMatchFromSetup(matchSetup()).fold(
+            ifLeft = { failure -> error("Unexpected save failure: $failure") },
+            ifRight = { it.id },
+        )
 
         setContent {
             App(
@@ -179,12 +174,10 @@ class AppDesktopUiTest {
     fun given_home_row_inline_score_when_clicked_then_route_moves_to_match_summary() = runComposeUiTest {
         val routeStateStore = AppRouteStateStore(initialRoute = ScorerRoute.HomeRoute)
         val matchRepository = InMemoryMatchRepository()
-        val matchId = runBlocking {
-            matchRepository.createMatchFromSetup(matchSetup()).fold(
-                ifLeft = { failure -> error("Unexpected save failure: $failure") },
-                ifRight = { it.id },
-            )
-        }
+        val matchId = matchRepository.createMatchFromSetup(matchSetup()).fold(
+            ifLeft = { failure -> error("Unexpected save failure: $failure") },
+            ifRight = { it.id },
+        )
 
         setContent {
             App(
@@ -198,7 +191,7 @@ class AppDesktopUiTest {
                 .fetchSemanticsNodes().isNotEmpty()
         }
 
-        onNodeWithTag("$HomeScoreMatchButtonTagPrefix$matchId").performClick()
+        onNodeWithTag("$HomeMatchRowTagPrefix$matchId").performClick()
 
         runOnIdle {
             assertEquals(ScorerRoute.MatchSummaryRoute(matchId = matchId), routeStateStore.currentRoute.value)

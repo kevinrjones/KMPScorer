@@ -1,6 +1,7 @@
 package cricket.knowledgespike.scorer.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,8 +23,8 @@ import androidx.compose.ui.platform.testTag
 import cricket.knowledgespike.scorer.ui.theme.ScorerSpacing
 
 const val HomeNewButtonTag = "home_new_button"
+const val HomeMatchRowTagPrefix = "home_match_row_"
 const val HomeEditMatchButtonTagPrefix = "home_edit_match_button_"
-const val HomeScoreMatchButtonTagPrefix = "home_score_match_button_"
 const val HomeDeleteMatchButtonTagPrefix = "home_delete_match_button_"
 
 @Composable
@@ -95,6 +96,8 @@ fun HomeScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .testTag("$HomeMatchRowTagPrefix${matchItem.id}")
+                                .clickable { onEvent(HomeScreenEvent.OpenSavedMatchRequested(matchItem.id)) }
                                 .padding(vertical = ScorerSpacing.Small),
                             horizontalArrangement = Arrangement.spacedBy(ScorerSpacing.Small),
                             verticalAlignment = Alignment.CenterVertically,
@@ -123,12 +126,6 @@ fun HomeScreen(
                                     onClick = { onEvent(HomeScreenEvent.EditMatchRequested(matchItem.id)) },
                                 ) {
                                     Text("Edit")
-                                }
-                                TextButton(
-                                    modifier = Modifier.testTag("$HomeScoreMatchButtonTagPrefix${matchItem.id}"),
-                                    onClick = { onEvent(HomeScreenEvent.ScoreMatchRequested(matchItem.id)) },
-                                ) {
-                                    Text("Score")
                                 }
                                 TextButton(
                                     modifier = Modifier.testTag("$HomeDeleteMatchButtonTagPrefix${matchItem.id}"),

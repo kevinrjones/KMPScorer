@@ -334,3 +334,42 @@ After each completed task, append a new dated entry under `Recent Task Log` with
   - Updated `AppRouteStateStoreTest` for stack semantics (push/pop/reset/replace and helper route methods).
   - Added desktop UI regressions in `AppDesktopUiTest` for top-bar back pop and expanded rail `Home`/`New Match` behaviors.
   - Verified with `./gradlew :shared:jvmTest :desktopApp:test --tests "cricket.knowledgespike.scorer.AppDesktopUiTest"` and `./gradlew :shared:jvmTest :desktopApp:test :androidApp:compileDebugKotlin` (success).
+
+#### 2026-05-29 16:46 — Sprint 2 task checklist creation with DB foundation gap audit
+
+- Title: `Sprint 2 task checklist with database foundation and history-home gap audit`.
+- Date/time completed: `2026-05-29 16:46`.
+- What was shipped:
+  - Created `docs/tasks/TASKS_SPRINT_2_DATABASE_FOUNDATION_AND_MATCH_HISTORY_HOME.md` with a detailed numbered checkbox task list derived from Sprint 2 scope.
+  - Audited current implementation status for Room persistence, setup-save-before-route flow, Home entry/history states, and read-only summary-by-`matchId`.
+  - Marked already-delivered Sprint 2 tasks as complete and added remaining open tasks for identified gaps.
+- Key decisions:
+  - Embedded test-first execution guidance directly into task flow instead of creating a separate testing workstream.
+  - Kept checklist aligned with existing docs/tasks style and intent-revealing task naming.
+  - Added explicit follow-up tasks for schema-history canonicalization, migration-readiness guard coverage, and Home row-tap contract alignment.
+- Gotchas:
+  - `shared/schemas` currently contains legacy schema artifacts under an older package path, which can obscure the canonical schema history path.
+  - Current Home interaction uses inline actions; Sprint 2 source wording expects row-tap summary open, so behavior contract needs explicit alignment.
+- Test coverage areas:
+  - No automated tests run (documentation/planning update only).
+
+#### 2026-05-29 17:00 — Sprint 2 closure: schema baseline hardening + Home row-tap summary contract
+
+- Title: `Sprint 2 closure with schema canonicalization, migration baseline guard, and Home row-tap summary alignment`.
+- Date/time completed: `2026-05-29 17:00`.
+- What was shipped:
+  - Aligned Home saved-match interaction with Sprint 2 contract by introducing row-tap open behavior to read-only summary by `matchId` in `HomeScreen`, `HomeScreenState`, and `HomeStateStore`.
+  - Updated Home tests to the new contract (`HomeStateStoreTest`, `HomeScreenUiTest`) using explicit row tag coverage.
+  - Added `ScorecardDatabaseSchemaBootstrapTest` in `shared/src/jvmTest` to fail fast on schema package/version drift from `ScorecardDatabase` configuration.
+  - Consolidated `shared/schemas` to the canonical Room schema package path by removing legacy duplicate schema artifacts.
+  - Documented explicit `v1` migration baseline anchor near `ScorecardDatabaseMigrations` via `BaselineSchemaVersion` contract.
+  - Recorded Sprint 2 completion evidence and checklist closure in sprint/task docs.
+- Key decisions:
+  - Treated `docs/tasks/TASKS_SPRINT_2_DATABASE_FOUNDATION_AND_MATCH_HISTORY_HOME.md` as the actionable Sprint 2 checklist source and completed all previously unchecked items.
+  - Kept navigation/state ownership centralized in state stores and route definitions; no service-locator-style DI introduced.
+- Gotchas:
+  - Legacy schema exports under an old package path can silently hide baseline drift without explicit guard coverage.
+  - Android module compile verification task naming differs from prior assumptions (`compileDebugSources` is available; `compileDebugKotlinAndroid` is not).
+- Test coverage areas:
+  - `./gradlew :shared:jvmTest --tests "*HomeStateStoreTest*" --tests "*HomeScreenUiTest*" --tests "*ScorecardDatabaseSchemaBootstrapTest*"`
+  - `./gradlew :domain:jvmTest :androidApp:compileDebugSources :desktopApp:classes`
