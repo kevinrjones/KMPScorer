@@ -34,6 +34,10 @@ compose.desktop {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "cricket.knowledgespike.scorer"
             packageVersion = "1.0.0"
+
+            buildTypes.release.proguard {
+                configurationFiles.from(project.file("proguard-rules.pro"))
+            }
         }
     }
 }
