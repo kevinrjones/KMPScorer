@@ -36,6 +36,9 @@ kotlin {
     }
 
     iosTargets.forEach { iosTarget ->
+        iosTarget.compilerOptions {
+            freeCompilerArgs.add("-Xoverride-konan-properties=minVersion.ios=15.0")
+        }
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = false
