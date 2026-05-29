@@ -32,8 +32,11 @@ data class MatchSetupScreenState(
 
 sealed interface MatchSetupStartMatchResult {
     data object Idle : MatchSetupStartMatchResult
+    data object Saving : MatchSetupStartMatchResult
     data class ValidationError(val message: String) : MatchSetupStartMatchResult
     data class Ready(val matchSetup: MatchSetup) : MatchSetupStartMatchResult
+    data class Saved(val matchId: Long) : MatchSetupStartMatchResult
+    data class PersistenceError(val message: String) : MatchSetupStartMatchResult
 }
 
 fun MatchSetupFormState.toTossWinnerOptionLabels(): TossWinnerOptionLabels {

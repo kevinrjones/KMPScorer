@@ -16,6 +16,8 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import cricket.knowledgespike.scorer.data.source.createRoomMatchRepository
+import cricket.knowledgespike.scorer.data.source.createJvmScorecardDatabase
 import cricket.knowledgespike.scorer.domain.preferences.AppThemePreference
 import cricket.knowledgespike.scorer.domain.preferences.DesktopWindowPreferences
 import cricket.knowledgespike.scorer.preferences.AppPreferencesStateStore
@@ -28,9 +30,20 @@ import java.io.File
 fun main() {
 
     application {
+        val appDataDirectory = remember {
+            File(System.getProperty("user.home"), ".kmpscorer")
+                .apply { mkdirs() }
+        }
+        val scorecardDatabase = remember {
+            createJvmScorecardDatabase(databaseDirectoryPath = appDataDirectory.absolutePath)
+        }
+        val matchRepository = remember(scorecardDatabase) {
+            createRoomMatchRepository(scorecardDatabase)
+        }
+
         val appPreferencesStateStore = remember {
             val preferencesFilePath = File(
-                File(System.getProperty("user.home"), ".kmpscorer"),
+                appDataDirectory,
                 "app_preferences.json",
             ).absolutePath
 
@@ -109,6 +122,7 @@ fun main() {
                 widthSizeClass = widthSizeClass,
                 resetMatchSetupSignal = resetMatchSetupSignal,
                 appPreferencesStateStore = appPreferencesStateStore,
+                matchRepository = matchRepository,
             )
         }
     }

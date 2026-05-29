@@ -721,6 +721,13 @@ private fun MatchSetupActionSection(
         when (val startMatchResult = screenState.startMatchResult) {
             MatchSetupStartMatchResult.Idle -> Unit
 
+            MatchSetupStartMatchResult.Saving -> {
+                MatchSetupResultMessage(
+                    message = "Saving match...",
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+
             is MatchSetupStartMatchResult.ValidationError -> {
                 MatchSetupResultMessage(
                     message = startMatchResult.message,
@@ -739,6 +746,20 @@ private fun MatchSetupActionSection(
                 ) {
                     Text("Prepare another match")
                 }
+            }
+
+            is MatchSetupStartMatchResult.Saved -> {
+                MatchSetupResultMessage(
+                    message = "Match #${startMatchResult.matchId} saved.",
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+
+            is MatchSetupStartMatchResult.PersistenceError -> {
+                MatchSetupResultMessage(
+                    message = startMatchResult.message,
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
         }
     }

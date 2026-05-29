@@ -228,3 +228,109 @@ After each completed task, append a new dated entry under `Recent Task Log` with
 - Key decisions: moved preferences DTO declarations and mappings out of `JsonPreferencesRepository` into dedicated files (`AppPreferencesConfigDto.kt`, `AppPreferencesConfigMappings.kt`) to reduce repository noise and keep persistence orchestration separate from serialization/mapping concerns; added focused utility unit tests (`ChoiceSectionDirectionalNavigationTest`) while relying on existing domain/state/repository and desktop UI tests for behavior preservation.
 - Gotchas: the new declarative validation flow in `CreateMatchSetupUseCase` depends on validation-before-creation invariants, so creation now uses guarded non-null requirements only after rule evaluation; keyboard-navigation behavior had to remain clamped at list edges to preserve existing desktop interaction semantics.
 - Test coverage areas: verified with `./gradlew :domain:allTests :shared:allTests :desktopApp:test --no-daemon` (success).
+
+#### 2026-05-28 09:16 — Compose Navigation 3 dependency confirmation and upgrade
+
+- Title: `Compose Navigation 3 dependency confirmation and upgrade`.
+- What was shipped: confirmed the project was not on Navigation 3 (`org.jetbrains.androidx.navigation:navigation-compose:2.9.2`), then upgraded shared navigation dependency wiring to `org.jetbrains.androidx.navigation3:navigation3-ui:1.1.1` via version catalog updates and shared module dependency update.
+- Key decisions: kept the existing centralized route state pattern (`AppRouteStateStore` + `ScorerRoute`) unchanged for this task and performed a dependency-line upgrade only; used JetBrains multiplatform Navigation 3 UI artifact directly after runtime artifact resolution proved unavailable in current repository setup.
+- Gotchas: `navigation3-runtime` under `org.jetbrains.androidx.navigation3` did not resolve in this environment, while `navigation3-ui` did; using the UI artifact directly resolved dependency compatibility for current module targets.
+- Test coverage areas: verified with `./gradlew :shared:allTests --no-daemon` (BUILD SUCCESSFUL).
+
+#### 2026-05-28 10:58 — Room persistence + Home history + summary flow sprint delivery
+
+- Title: `Room persistence foundation, persisted start flow, Home history entry, and summary route slice`.
+- What was shipped:
+  - Added typed domain persistence contracts/models and use cases (`MatchRepository`, `ScoreEventRepository`, `CreateAndSaveMatchUseCase`, `StoredMatch`, `ScoreEvent`, `MatchSummary`).
+  - Implemented Room persistence foundation in shared code (`MatchEntity`, `ScoreEventEntity`, DAOs, `ScorecardDatabase`, schema export v1, local data sources, Room repositories, mapper layer).
+  - Wired platform DB builders/paths and repository injection across Android/iOS/Desktop entry points.
+  - Refactored setup start flow to `validate -> persist -> route(matchId)` with explicit save states/errors.
+  - Added Home route/state/store/screen with loading/empty/content/error states, `New` action, and match-row summary navigation.
+  - Added read-only Match Summary route/state/store/screen backed by repository query by `matchId`.
+  - Inserted new Sprint 2 DB/Home sprint docs, renumbered downstream sprint docs to Sprint 8, and updated roadmap/recap references.
+- Key decisions:
+  - Kept expected failures explicit with Arrow `Either` and typed persistence errors (no exception-driven normal flow).
+  - Kept domain models platform-neutral and route ownership centralized in `ScorerRoute` + `AppRouteStateStore`.
+  - Used constructor-injected dependencies and avoided service-locator-style DI calls.
+- Gotchas:
+  - `kotlinx-datetime` API expectations required aligning epoch-day storage to `Long` and using current Kotlin time APIs for timestamp defaults.
+  - New `MatchSetupStartMatchResult` variants required exhaustive UI handling in `MatchSetupScreen`.
+- Test coverage areas:
+  - Added/updated mapper/repository/data-source/store/UI tests including `EntityMappingsTest`, `RoomMatchRepositoryTest`, `RoomScoreEventRepositoryTest`, `RoomLocalDataSourceTest`, `MatchSetupStateStoreTest`, `AppRouteStateStoreTest`, `HomeStateStoreTest`, `MatchSummaryStateStoreTest`, and `HomeScreenUiTest`.
+  - Verified with `./gradlew :shared:jvmTest :domain:jvmTest :desktopApp:compileKotlin :androidApp:compileDebugKotlin` (success).
+
+#### 2026-05-28 11:27 — Home history blank after creating match regression fix
+
+- Title: `Scoring back-route correction and deterministic Home history refresh on route re-entry`.
+- What was shipped:
+  - Fixed `ScoringEntryRoute` placeholder action so `Back to Match setup` navigates to `MatchSetupRoute` (not `HomeRoute`).
+  - Added Home re-entry refresh in `App.kt` via route-keyed effect dispatching `HomeScreenEvent.RefreshRequested` when the current route is `Home`.
+  - Added desktop regression tests in `desktopApp/src/test/kotlin/cricket/knowledgespike/scorer/AppDesktopUiTest.kt` for both reported symptoms.
+- Key decisions:
+  - Kept navigation ownership centralized in `AppRouteStateStore` and route handling in `App` (no composable-level business logic drift).
+  - Used route-entry refresh trigger instead of repository polling to keep state updates explicit and deterministic.
+- Gotchas:
+  - Route changes issued in the same frame can be coalesced in Compose tests; regression sequence was stabilized by separating `showMatchSetup()` and `showHome()` across idles.
+  - Desktop test module needed explicit `testImplementation` for `arrow-core` and `kotlinx-datetime` due direct repository/domain usage in tests.
+- Test coverage areas:
+  - Reproducer/fix validation: `./gradlew :desktopApp:test --tests "cricket.knowledgespike.scorer.AppDesktopUiTest"`.
+  - Broader impacted verification: `./gradlew :shared:jvmTest :desktopApp:test`.
+
+#### 2026-05-28 11:37 — Home match action menu with confirmation-gated delete
+
+- Title: `Home match actions: Edit, Score fallback, and delete with confirmation`.
+- What was shipped:
+  - Changed Home match-row interaction from direct navigation to action dialog options: `Edit`, `Score`, and `Delete`.
+  - Implemented `Edit` to route to `MatchSetupRoute` and `Score` to route to current fallback `MatchSummaryRoute(matchId)`.
+  - Implemented confirmation-gated delete flow in Home state/UI so matches are deleted only after explicit confirmation.
+  - Extended persistence contract and implementations with `MatchRepository.deleteMatch(matchId)` plus typed delete failures.
+- Key decisions:
+  - Kept route ownership centralized in `HomeStateStore` + `ScorerRoute`; UI remains declarative and event-driven.
+  - Modeled delete failures explicitly with Arrow-style error typing (`MatchPersistenceError.UnableToDeleteMatch`) instead of exception-driven flow.
+- Gotchas:
+  - Adding a new persistence error variant required updating all exhaustive UI error mappers and all `MatchRepository` test doubles.
+  - Existing Home tests assumed direct row-to-summary routing; they were reworked to verify dialog-state transitions before routing/deleting.
+- Test coverage areas:
+  - Added/updated tests in `HomeStateStoreTest`, `HomeScreenUiTest`, `RoomMatchRepositoryTest`, `RoomLocalDataSourceTest`, `MatchSetupStateStoreTest`, and `MatchSummaryStateStoreTest`.
+  - Verified with `./gradlew :shared:jvmTest :desktopApp:test --tests "cricket.knowledgespike.scorer.AppDesktopUiTest"` and `./gradlew :shared:jvmTest :desktopApp:test` (success).
+
+#### 2026-05-29 11:15 — Home inline row actions (no action popup)
+
+- Title: `Inline Home row actions for Edit/Score/Delete`.
+- Date/time completed: `2026-05-29 11:15`.
+- What was shipped:
+  - Replaced Home match-row action popup flow with inline per-row `Edit`, `Score`, and `Delete` buttons in `HomeScreen`.
+  - Kept delete safety behavior by preserving confirmation dialog before `MatchRepository.deleteMatch(matchId)` executes.
+  - Simplified Home presentation model by removing `MatchSelected` and `HomeMatchDialogState.MatchActions` from screen state/events.
+  - Added desktop app-route UI coverage for inline `Edit` and `Score` button navigation outcomes.
+- Key decisions:
+  - Kept navigation centralized in `HomeStateStore` and `ScorerRoute`; composables remain declarative and stateless.
+  - Introduced stable per-row button test tags (`home_edit_match_button_*`, `home_score_match_button_*`, `home_delete_match_button_*`) for deterministic UI tests.
+- Gotchas:
+  - Shared Compose UI tests are iOS-gated in this repo, so desktop UI regression tests are required to validate inline button interactions on JVM.
+  - Dialog `Delete` button text now coexists with row `Delete` labels, so tests must avoid ambiguous node selection.
+- Test coverage areas:
+  - Updated `HomeStateStoreTest` and `HomeScreenUiTest` for inline action events and confirmation behavior.
+  - Added `AppDesktopUiTest` coverage for inline `Edit` -> `MatchSetupRoute` and inline `Score` -> `MatchSummaryRoute(matchId)`.
+  - Verified with `./gradlew :shared:jvmTest :desktopApp:test --tests "cricket.knowledgespike.scorer.AppDesktopUiTest"` (success).
+
+#### 2026-05-29 11:37 — Stack-based navigation shell with adaptive back behavior
+
+- Title: `Route stack navigation with adaptive app shell and desktop rail`.
+- Date/time completed: `2026-05-29 11:37`.
+- What was shipped:
+  - Refactored `AppRouteStateStore` from single-route state to stack-backed navigation (`routeStack`) with explicit `push`, `replaceTop`, `pop`, and `resetToHome` APIs.
+  - Updated shared `App` shell to render a stack-aware `TopAppBar` with conditional back arrow and to route back actions through stack `pop`.
+  - Added expanded-width adaptive shell behavior using `NavigationRail` actions (`Home`, `New Match`) and made `Home` always reset stack depth.
+  - Updated navigation wiring so `ScoringEntryRoute` completion/back path replaces top route where appropriate, while new forward routes push to stack.
+  - Added platform back-handler abstraction (`PlatformBackHandler`) with Android actual using `androidx.activity.compose.BackHandler` and non-Android no-op actuals.
+- Key decisions:
+  - Kept navigation ownership centralized in `AppRouteStateStore` and route usage centralized in `App` to avoid route logic scattering.
+  - Used an expect/actual bridge for back handling to keep common code platform-neutral while still using Android idiomatic `BackHandler`.
+- Gotchas:
+  - `androidx.activity:activity-compose` cannot be used in `commonMain`; it must stay platform-scoped (`androidMain`) to avoid JVM target resolution failures.
+  - `TopAppBar` usage required `@OptIn(ExperimentalMaterial3Api::class)` under current library versions.
+- Test coverage areas:
+  - Updated `AppRouteStateStoreTest` for stack semantics (push/pop/reset/replace and helper route methods).
+  - Added desktop UI regressions in `AppDesktopUiTest` for top-bar back pop and expanded rail `Home`/`New Match` behaviors.
+  - Verified with `./gradlew :shared:jvmTest :desktopApp:test --tests "cricket.knowledgespike.scorer.AppDesktopUiTest"` and `./gradlew :shared:jvmTest :desktopApp:test :androidApp:compileDebugKotlin` (success).

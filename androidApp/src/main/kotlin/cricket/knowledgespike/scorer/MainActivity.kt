@@ -9,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import cricket.knowledgespike.scorer.data.source.createRoomMatchRepository
+import cricket.knowledgespike.scorer.data.source.createAndroidScorecardDatabase
 import cricket.knowledgespike.scorer.preferences.AppPreferencesStateStore
 import cricket.knowledgespike.scorer.preferences.JsonPreferencesRepository
 import cricket.knowledgespike.scorer.preferences.OkioPreferencesStorageDataSource
@@ -21,6 +23,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
+            val scorecardDatabase = remember { createAndroidScorecardDatabase(this@MainActivity) }
+            val matchRepository = remember(scorecardDatabase) {
+                createRoomMatchRepository(scorecardDatabase)
+            }
             val appPreferencesStateStore = remember {
                 val preferencesFilePath = File(filesDir, "app_preferences.json").absolutePath
                 AppPreferencesStateStore(
@@ -33,6 +39,7 @@ class MainActivity : ComponentActivity() {
             App(
                 widthSizeClass = widthSizeClass,
                 appPreferencesStateStore = appPreferencesStateStore,
+                matchRepository = matchRepository,
             )
         }
     }

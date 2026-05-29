@@ -90,7 +90,35 @@ cross-platform scoring product.
 - Route handling remains centralized and test-covered.
 - No platform-specific APIs leak into `:domain`.
 
-### Sprint 2 — Ball-by-ball scoring domain core
+### Sprint 2 — Database foundation and match history home
+
+#### Outcome
+
+- Match setup persistence and match history home flow are delivered on a versioned SQLite foundation.
+
+#### MoSCoW coverage
+
+- Primary: `M1`, `M12`
+- Foundation for: `M2`, `M4`, `M7`
+
+#### Module/file touchpoints
+
+- `domain/src/commonMain/kotlin/.../domain/repository/*` (new persistence contracts)
+- `shared/src/commonMain/kotlin/.../foundation/room/*` (new)
+- `shared/src/commonMain/kotlin/.../data/entity/*` and `.../data/source/*`
+- `shared/src/commonMain/kotlin/.../home/*` (new)
+- `shared/src/commonMain/kotlin/.../matchsummary/*` (new)
+- `shared/src/commonMain/kotlin/.../navigation/ScorerRoute.kt`
+- platform entry points (`MainActivity.kt`, `MainViewController.kt`, `desktopApp/main.kt`)
+
+#### Definition of done
+
+- `Start Match` persists validated setup before route transition.
+- Home is app entry and lists persisted matches with explicit load states.
+- Match tap opens read-only summary by `matchId`.
+- Room schema baseline is exported and migration-ready (`v1`).
+
+### Sprint 3 — Ball-by-ball scoring domain core
 
 #### Outcome
 
@@ -112,7 +140,7 @@ cross-platform scoring product.
 - Illegal operations are blocked with explicit error types.
 - Domain tests cover nominal, invalid, and edge transitions.
 
-### Sprint 3 — Live scoring UI and scorecard views
+### Sprint 4 — Live scoring UI and scorecard views
 
 #### Outcome
 
@@ -136,7 +164,7 @@ cross-platform scoring product.
 - Desktop includes dedicated scorer ergonomics (menu/shortcut support).
 - Mobile and desktop use shared state contracts, not duplicated business logic.
 
-### Sprint 4 — Correction workflows and offline durability
+### Sprint 5 — Correction workflows and offline durability
 
 #### Outcome
 
@@ -160,7 +188,7 @@ cross-platform scoring product.
 - Correction metadata (`who`, `when`, `what changed`) is persisted.
 - Crash/restart recovery restores active match state without corruption.
 
-### Sprint 5 — MUST completion wave
+### Sprint 6 — MUST completion wave
 
 #### Outcome
 
@@ -186,7 +214,7 @@ cross-platform scoring product.
 - Format templates support limited overs and two-innings configuration.
 - Sync/export state is explicit (`pending`, `synced`, `failed`, `conflict`).
 
-### Sprint 6 — SHOULD wave 1 (differentiation)
+### Sprint 7 — SHOULD wave 1 (differentiation)
 
 #### Outcome
 
@@ -209,7 +237,7 @@ cross-platform scoring product.
 - Collaboration lock/handover state is explicit and test-covered.
 - Accessibility and desktop workflow improvements are verified.
 
-### Sprint 7 — SHOULD wave 2 (competition operations)
+### Sprint 8 — SHOULD wave 2 (competition operations)
 
 #### Outcome
 
@@ -240,33 +268,33 @@ cross-platform scoring product.
 
 | Feature ID | Sprint wave |
 | --- | --- |
-| `M1` | Sprint 1 (harden + route handoff), Sprint 5 (final integration pass) |
-| `M2` | Sprint 2 (domain core), Sprint 3 (UI integration) |
-| `M3` | Sprint 2 (rules), Sprint 3 (interaction validation) |
-| `M4` | Sprint 4 |
-| `M5` | Sprint 4 |
-| `M6` | Sprint 5 |
-| `M7` | Sprint 3 |
-| `M8` | Sprint 5 |
-| `M9` | Sprint 3 (baseline), then enforced each sprint |
-| `M10` | Sprint 3 |
-| `M11` | Sprint 5 |
-| `M12` | Sprint 1-7 cross-cutting quality gate |
+| `M1` | Sprint 1 (harden + route handoff), Sprint 6 (final integration pass) |
+| `M2` | Sprint 3 (domain core), Sprint 4 (UI integration) |
+| `M3` | Sprint 3 (rules), Sprint 4 (interaction validation) |
+| `M4` | Sprint 5 |
+| `M5` | Sprint 5 |
+| `M6` | Sprint 6 |
+| `M7` | Sprint 4 |
+| `M8` | Sprint 6 |
+| `M9` | Sprint 4 (baseline), then enforced each sprint |
+| `M10` | Sprint 4 |
+| `M11` | Sprint 6 |
+| `M12` | Sprint 1-8 cross-cutting quality gate |
 
 ### SHOULD mapping
 
 | Feature ID | Sprint wave |
 | --- | --- |
-| `S1` | Sprint 6 |
-| `S2` | Sprint 7 |
-| `S3` | Sprint 6 |
-| `S4` | Sprint 7 |
-| `S5` | Sprint 6 |
-| `S6` | Sprint 7 |
-| `S7` | Sprint 7 |
-| `S8` | Sprint 6 |
-| `S9` | Sprint 6 |
-| `S10` | Sprint 7 |
+| `S1` | Sprint 7 |
+| `S2` | Sprint 8 |
+| `S3` | Sprint 7 |
+| `S4` | Sprint 8 |
+| `S5` | Sprint 7 |
+| `S6` | Sprint 8 |
+| `S7` | Sprint 8 |
+| `S8` | Sprint 7 |
+| `S9` | Sprint 7 |
+| `S10` | Sprint 8 |
 
 ### Deferred scope (explicitly not in planned waves)
 
@@ -285,13 +313,13 @@ cross-platform scoring product.
 ### Delivery risks and mitigations
 
 - **Risk:** domain-rule complexity creates late regressions.
-  - **Mitigation:** prioritize high-volume domain transition tests in Sprint 2 before UI scale-out.
+  - **Mitigation:** prioritize high-volume domain transition tests in Sprint 3 before UI scale-out.
 - **Risk:** correction and offline persistence drift out of sync.
   - **Mitigation:** use immutable event history and deterministic replay as the source of truth.
 - **Risk:** desktop UX gets treated as stretched mobile UI.
-  - **Mitigation:** enforce desktop-specific workflow checkpoints in Sprints 3 and 6.
+  - **Mitigation:** enforce desktop-specific workflow checkpoints in Sprints 4 and 7.
 - **Risk:** SHOULD scope starts before MUST closure.
-  - **Mitigation:** Sprint 5 includes explicit `M1`-`M12` completion gate before Sprint 6 starts.
+  - **Mitigation:** Sprint 6 includes explicit `M1`-`M12` completion gate before Sprint 7 starts.
 
 ## Quality gates and definition-of-done checkpoints
 
@@ -307,8 +335,9 @@ cross-platform scoring product.
 
 - **Sprint 0 checkpoint:** placeholder UI tidy-up scope is documented and bounded.
 - **Sprint 1 checkpoint:** setup-to-scoring route transition is explicit and reducer-tested.
-- **Sprint 2 checkpoint:** domain rules pass deterministic transition test suite.
-- **Sprint 3 checkpoint:** live scoring UI/state transitions cover loading/content/empty/error.
-- **Sprint 4 checkpoint:** undo/edit/replay and restart recovery scenarios are test-covered.
-- **Sprint 5 checkpoint:** all MUST IDs (`M1`-`M12`) are marked baseline-delivered.
-- **Sprint 6-7 checkpoint:** SHOULD items delivered without regressing MUST quality gates.
+- **Sprint 2 checkpoint:** persisted setup + home history + summary route flow are validated.
+- **Sprint 3 checkpoint:** domain rules pass deterministic transition test suite.
+- **Sprint 4 checkpoint:** live scoring UI/state transitions cover loading/content/empty/error.
+- **Sprint 5 checkpoint:** undo/edit/replay and restart recovery scenarios are test-covered.
+- **Sprint 6 checkpoint:** all MUST IDs (`M1`-`M12`) are marked baseline-delivered.
+- **Sprint 7-8 checkpoint:** SHOULD items delivered without regressing MUST quality gates.

@@ -1,12 +1,21 @@
 package cricket.knowledgespike.scorer.matchsetup
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
+import cricket.knowledgespike.scorer.domain.match.CreateAndSaveMatchUseCase
 import cricket.knowledgespike.scorer.domain.matchsetup.CreateMatchSetupUseCase
 import cricket.knowledgespike.scorer.domain.matchsetup.MatchSchedule
 import cricket.knowledgespike.scorer.domain.matchsetup.MatchScheduleType
 import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetup
 import cricket.knowledgespike.scorer.domain.matchsetup.TossDecision
 import cricket.knowledgespike.scorer.domain.matchsetup.TossWinner
+import cricket.knowledgespike.scorer.domain.model.MatchSummary
+import cricket.knowledgespike.scorer.domain.model.StoredMatch
+import cricket.knowledgespike.scorer.domain.repository.MatchPersistenceError
+import cricket.knowledgespike.scorer.domain.repository.MatchRepository
 import cricket.knowledgespike.scorer.navigation.ScorerRoute
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -188,25 +197,35 @@ class MatchSetupStateStoreTest {
     }
 
     @Test
-    fun `given invalid form when start match requested via store then route intent is not emitted`() {
+    fun `given invalid form when start match requested via store then route intent is not emitted`() = runTest {
         var requestedRoute: ScorerRoute? = null
+        val fakeMatchRepository = FakeMatchRepository()
         val stateStore = MatchSetupStateStore(
             createMatchSetupUseCase = createMatchSetupUseCase,
+            createAndSaveMatchUseCase = CreateAndSaveMatchUseCase(fakeMatchRepository),
             onRouteRequested = { requestedRoute = it },
+            coroutineScope = this,
         )
 
         stateStore.onEvent(MatchSetupScreenEvent.StartMatchRequested)
+        testScheduler.advanceUntilIdle()
 
         assertNull(requestedRoute)
         assertIs<MatchSetupStartMatchResult.ValidationError>(stateStore.screenState.value.startMatchResult)
+        assertEquals(0, fakeMatchRepository.createCallsCount)
     }
 
     @Test
-    fun `given valid form when start match requested via store then scoring entry route intent is emitted`() {
+    fun `given valid form when start match requested via store then scoring entry route intent is emitted`() = runTest {
         var requestedRoute: ScorerRoute? = null
+        val fakeMatchRepository = FakeMatchRepository(
+            createResult = storedMatch(id = 45L).right(),
+        )
         val stateStore = MatchSetupStateStore(
             createMatchSetupUseCase = createMatchSetupUseCase,
+            createAndSaveMatchUseCase = CreateAndSaveMatchUseCase(fakeMatchRepository),
             onRouteRequested = { requestedRoute = it },
+            coroutineScope = this,
         )
 
         stateStore.onEvent(MatchSetupScreenEvent.TeamANameChanged("Falcons"))
@@ -217,23 +236,26 @@ class MatchSetupStateStoreTest {
         stateStore.onEvent(MatchSetupScreenEvent.MatchDateChanged("2026-05-25"))
 
         stateStore.onEvent(MatchSetupScreenEvent.StartMatchRequested)
+        testScheduler.advanceUntilIdle()
 
         val latestState = stateStore.screenState.value
         assertTrue(latestState.canStartMatch)
-        assertIs<MatchSetupStartMatchResult.Ready>(latestState.startMatchResult)
+        assertEquals(MatchSetupStartMatchResult.Saved(matchId = 45L), latestState.startMatchResult)
         val scoringRoute = assertIs<ScorerRoute.ScoringEntryRoute>(requestedRoute)
-        assertEquals("Falcons", scoringRoute.matchSetup.teamAName)
-        assertEquals("Kings", scoringRoute.matchSetup.teamBName)
-        assertEquals(MatchScheduleType.Overs, scoringRoute.matchSetup.schedule.type)
-        assertEquals(20, scoringRoute.matchSetup.schedule.amount)
+        assertEquals(45L, scoringRoute.matchId)
     }
 
     @Test
-    fun `given valid form when start requested repeatedly then emitted route intents are deterministic`() {
+    fun `given valid form when start requested repeatedly then emitted route intents are deterministic`() = runTest {
         val requestedRoutes = mutableListOf<ScorerRoute>()
+        val fakeMatchRepository = FakeMatchRepository(
+            createResult = storedMatch(id = 77L).right(),
+        )
         val stateStore = MatchSetupStateStore(
             createMatchSetupUseCase = createMatchSetupUseCase,
+            createAndSaveMatchUseCase = CreateAndSaveMatchUseCase(fakeMatchRepository),
             onRouteRequested = { requestedRoutes.add(it) },
+            coroutineScope = this,
         )
 
         stateStore.onEvent(MatchSetupScreenEvent.TeamANameChanged("Falcons"))
@@ -245,19 +267,26 @@ class MatchSetupStateStoreTest {
 
         stateStore.onEvent(MatchSetupScreenEvent.StartMatchRequested)
         stateStore.onEvent(MatchSetupScreenEvent.StartMatchRequested)
+        testScheduler.advanceUntilIdle()
 
         assertEquals(2, requestedRoutes.size)
         val firstRoute = assertIs<ScorerRoute.ScoringEntryRoute>(requestedRoutes[0])
         val secondRoute = assertIs<ScorerRoute.ScoringEntryRoute>(requestedRoutes[1])
         assertEquals(firstRoute, secondRoute)
+        assertEquals(77L, firstRoute.matchId)
     }
 
     @Test
-    fun `given validation error when user corrects fields and retries then store transitions to ready and emits route`() {
+    fun `given validation error when user corrects fields and retries then store transitions to ready and emits route`() = runTest {
         var requestedRoute: ScorerRoute? = null
+        val fakeMatchRepository = FakeMatchRepository(
+            createResult = storedMatch(id = 88L).right(),
+        )
         val stateStore = MatchSetupStateStore(
             createMatchSetupUseCase = createMatchSetupUseCase,
+            createAndSaveMatchUseCase = CreateAndSaveMatchUseCase(fakeMatchRepository),
             onRouteRequested = { requestedRoute = it },
+            coroutineScope = this,
         )
 
         stateStore.onEvent(MatchSetupScreenEvent.StartMatchRequested)
@@ -270,11 +299,45 @@ class MatchSetupStateStoreTest {
         stateStore.onEvent(MatchSetupScreenEvent.TossDecisionChanged(TossDecision.Bat))
         stateStore.onEvent(MatchSetupScreenEvent.MatchDateChanged("2026-05-25"))
         stateStore.onEvent(MatchSetupScreenEvent.StartMatchRequested)
+        testScheduler.advanceUntilIdle()
 
         val latestState = stateStore.screenState.value
         assertTrue(latestState.canStartMatch)
-        assertIs<MatchSetupStartMatchResult.Ready>(latestState.startMatchResult)
-        assertIs<ScorerRoute.ScoringEntryRoute>(requestedRoute)
+        assertEquals(MatchSetupStartMatchResult.Saved(matchId = 88L), latestState.startMatchResult)
+        val scoringRoute = assertIs<ScorerRoute.ScoringEntryRoute>(requestedRoute)
+        assertEquals(88L, scoringRoute.matchId)
+    }
+
+    @Test
+    fun `given persistence failure when start match requested then save error is shown and no route is emitted`() = runTest {
+        var requestedRoute: ScorerRoute? = null
+        val stateStore = MatchSetupStateStore(
+            createMatchSetupUseCase = createMatchSetupUseCase,
+            createAndSaveMatchUseCase = CreateAndSaveMatchUseCase(
+                FakeMatchRepository(
+                    createResult = MatchPersistenceError.UnableToWriteMatch("disk full").left(),
+                ),
+            ),
+            onRouteRequested = { requestedRoute = it },
+            coroutineScope = this,
+        )
+
+        stateStore.onEvent(MatchSetupScreenEvent.TeamANameChanged("Falcons"))
+        stateStore.onEvent(MatchSetupScreenEvent.TeamBNameChanged("Kings"))
+        stateStore.onEvent(MatchSetupScreenEvent.ScheduleAmountChanged("20"))
+        stateStore.onEvent(MatchSetupScreenEvent.TossWinnerChanged(TossWinner.TeamA))
+        stateStore.onEvent(MatchSetupScreenEvent.TossDecisionChanged(TossDecision.Bat))
+        stateStore.onEvent(MatchSetupScreenEvent.MatchDateChanged("2026-05-25"))
+        stateStore.onEvent(MatchSetupScreenEvent.StartMatchRequested)
+        testScheduler.advanceUntilIdle()
+
+        val latestState = stateStore.screenState.value
+        assertTrue(latestState.canStartMatch)
+        assertEquals(
+            MatchSetupStartMatchResult.PersistenceError("Unable to save the match. Please try again."),
+            latestState.startMatchResult,
+        )
+        assertNull(requestedRoute)
     }
 
     @Test
@@ -310,5 +373,55 @@ class MatchSetupStateStoreTest {
             umpireTwo = null,
             weather = null,
         )
+    }
+
+    private fun storedMatch(id: Long): StoredMatch {
+        return StoredMatch(
+            id = id,
+            matchSetup = matchSetup(),
+            createdAtEpochMillis = 10L,
+            updatedAtEpochMillis = 10L,
+        )
+    }
+}
+
+private class FakeMatchRepository(
+    private val createResult: Either<MatchPersistenceError, StoredMatch> =
+        StoredMatch(
+            id = 1L,
+            matchSetup = MatchSetup(
+                teamAName = "Falcons",
+                teamBName = "Kings",
+                schedule = MatchSchedule(type = MatchScheduleType.Overs, amount = 20),
+                tossWinner = TossWinner.TeamA,
+                tossDecision = TossDecision.Bat,
+                matchDate = LocalDate.parse("2026-05-25"),
+                venue = null,
+                umpireOne = null,
+                umpireTwo = null,
+                weather = null,
+            ),
+            createdAtEpochMillis = 10L,
+            updatedAtEpochMillis = 10L,
+        ).right(),
+) : MatchRepository {
+    var createCallsCount: Int = 0
+        private set
+
+    override suspend fun createMatchFromSetup(matchSetup: MatchSetup): Either<MatchPersistenceError, StoredMatch> {
+        createCallsCount += 1
+        return createResult
+    }
+
+    override suspend fun listStoredMatches(): Either<MatchPersistenceError, List<StoredMatch>> {
+        return emptyList<StoredMatch>().right()
+    }
+
+    override suspend fun deleteMatch(matchId: Long): Either<MatchPersistenceError, Unit> {
+        return MatchPersistenceError.UnableToDeleteMatch("not used").left()
+    }
+
+    override suspend fun getMatchSummary(matchId: Long): Either<MatchPersistenceError, MatchSummary> {
+        return MatchPersistenceError.MatchNotFound(matchId).left()
     }
 }

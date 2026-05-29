@@ -1,4 +1,4 @@
-# Sprint 5 — MUST completion wave
+# Sprint 6 — MUST completion wave
 
 ## Objective
 
@@ -69,8 +69,8 @@ fundamentals on top of the stable scoring core.
 
 ## Dependencies
 
-- Correction and persistence foundations from Sprint 4.
-- Stable setup and scoring route flow from Sprints 1-3.
+- Correction and persistence foundations from Sprint 5.
+- Stable setup and scoring route flow from Sprints 1-4.
 
 ## Risks and mitigations
 

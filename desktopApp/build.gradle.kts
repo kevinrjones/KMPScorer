@@ -22,6 +22,8 @@ kotlin {
 dependencies {
     testImplementation(libs.kotlin.testJunit)
     testImplementation(libs.compose.ui.test)
+    testImplementation(libs.arrow.core)
+    testImplementation(libs.kotlinx.datetime)
 }
 
 compose.desktop {

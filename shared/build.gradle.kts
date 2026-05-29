@@ -63,7 +63,7 @@ kotlin {
 
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.jetbrains.compose.navigation)
+            implementation(libs.jetbrains.compose.navigation3.ui)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.okio)
             implementation(libs.kotlinx.datetime)
@@ -88,6 +88,9 @@ kotlin {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.compose.ui.test)
+        }
+        androidMain.dependencies {
+            implementation(libs.androidx.activity.compose)
         }
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)

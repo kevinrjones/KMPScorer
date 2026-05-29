@@ -1,4 +1,4 @@
-# Sprint 7 — SHOULD wave 2 (competition operations)
+# Sprint 8 — SHOULD wave 2 (competition operations)
 
 ## Objective
 
@@ -75,9 +75,9 @@ league/tournament workflows with auditable outcomes.
 
 ## Dependencies
 
-- MUST completion baseline from Sprint 5.
-- Collaboration and sharing state maturity from Sprint 6.
-- Existing correction + sync state contracts from Sprints 4-5.
+- MUST completion baseline from Sprint 6.
+- Collaboration and sharing state maturity from Sprint 7.
+- Existing correction + sync state contracts from Sprints 5-6.
 
 ## Risks and mitigations
 

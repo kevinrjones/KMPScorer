@@ -1,8 +1,8 @@
-# Sprint 3 — Live scoring UI and scorecard views
+# Sprint 4 — Live scoring UI and scorecard views
 
 ## Objective
 
-Deliver the first complete scorer-facing live workflow across platforms, wired to the Sprint 2
+Deliver the first complete scorer-facing live workflow across platforms, wired to the Sprint 3
 domain contracts.
 
 ## MoSCoW scope
@@ -28,8 +28,8 @@ domain contracts.
 
 ## Out of scope
 
-- Deep correction and replay history tooling (Sprint 4).
-- Roster and format management baseline implementation (Sprint 5).
+- Deep correction and replay history tooling (Sprint 5).
+- Roster and format management baseline implementation (Sprint 6).
 - Public/tournament SHOULD features.
 
 ## Work breakdown
@@ -67,7 +67,7 @@ domain contracts.
 
 ## Dependencies
 
-- Stable domain scoring contracts from Sprint 2.
+- Stable domain scoring contracts from Sprint 3.
 - Existing match setup route handoff from Sprint 1.
 
 ## Risks and mitigations

@@ -1,4 +1,4 @@
-# Sprint 4 — Correction workflows and offline durability
+# Sprint 5 — Correction workflows and offline durability
 
 ## Objective
 
@@ -59,8 +59,8 @@ history and continue matches after interruptions.
 
 ## Dependencies
 
-- Sprint 2 event model determinism.
-- Sprint 3 live scoring UI/state contracts for correction UX integration.
+- Sprint 3 event model determinism.
+- Sprint 4 live scoring UI/state contracts for correction UX integration.
 
 ## Risks and mitigations
 
@@ -85,4 +85,4 @@ history and continue matches after interruptions.
 - Scorers can undo and edit any previous delivery with deterministic recompute.
 - Offline scoring survives process death/app restart without data corruption.
 - Correction and recovery states are explicit in UI.
-- Foundation is ready for MUST completion wave in Sprint 5.
+- Foundation is ready for MUST completion wave in Sprint 6.

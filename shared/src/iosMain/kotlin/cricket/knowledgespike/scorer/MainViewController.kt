@@ -6,6 +6,8 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.remember
 import androidx.compose.ui.window.ComposeUIViewController
+import cricket.knowledgespike.scorer.data.source.createIosScorecardDatabase
+import cricket.knowledgespike.scorer.data.source.createRoomMatchRepository
 import cricket.knowledgespike.scorer.preferences.AppPreferencesStateStore
 import cricket.knowledgespike.scorer.preferences.JsonPreferencesRepository
 import cricket.knowledgespike.scorer.preferences.OkioPreferencesStorageDataSource
@@ -18,6 +20,11 @@ import platform.Foundation.NSUserDomainMask
 fun MainViewController() = ComposeUIViewController(
     configure = {  }
 ) {
+    val scorecardDatabase = remember { createIosScorecardDatabase() }
+    val matchRepository = remember(scorecardDatabase) {
+        createRoomMatchRepository(scorecardDatabase)
+    }
+
     val appPreferencesStateStore = remember {
         val documentsDirectory = NSSearchPathForDirectoriesInDomains(
             directory = NSDocumentDirectory,
@@ -38,5 +45,6 @@ fun MainViewController() = ComposeUIViewController(
     App(
         widthSizeClass = widthSizeClass,
         appPreferencesStateStore = appPreferencesStateStore,
+        matchRepository = matchRepository,
     )
 }

@@ -1,4 +1,4 @@
-# Sprint 6 — SHOULD wave 1 (differentiation)
+# Sprint 7 — SHOULD wave 1 (differentiation)
 
 ## Objective
 
@@ -34,7 +34,7 @@ advanced insights, desktop workflow quality, and accessibility.
 
 ## Out of scope
 
-- Tournament/fixture operations and rain adjustments (Sprint 7).
+- Tournament/fixture operations and rain adjustments (Sprint 8).
 - COULD backlog features such as predictive analytics and streaming hooks.
 
 ## Work breakdown
@@ -72,8 +72,8 @@ advanced insights, desktop workflow quality, and accessibility.
 
 ## Dependencies
 
-- MUST-complete baseline from Sprint 5.
-- Stable scoring event model and summary contracts from Sprints 2-5.
+- MUST-complete baseline from Sprint 6.
+- Stable scoring event model and summary contracts from Sprints 3-6.
 
 ## Risks and mitigations
 

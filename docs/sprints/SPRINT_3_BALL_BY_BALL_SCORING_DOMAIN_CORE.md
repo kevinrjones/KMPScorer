@@ -1,9 +1,9 @@
-# Sprint 2 — Ball-by-ball scoring domain core
+# Sprint 3 — Ball-by-ball scoring domain core
 
 ## Objective
 
 Build the deterministic scoring engine in `:domain` as the source of truth for legal cricket state
-transitions, preparing for UI integration in Sprint 3.
+transitions, preparing for UI integration in Sprint 4.
 
 ## MoSCoW scope
 

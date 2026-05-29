@@ -1,17 +1,26 @@
 package cricket.knowledgespike.scorer.matchsetup
 
+import cricket.knowledgespike.scorer.domain.match.CreateAndSaveMatchUseCase
 import cricket.knowledgespike.scorer.domain.matchsetup.CreateMatchSetupUseCase
+import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetup
 import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetupDraft
 import cricket.knowledgespike.scorer.domain.matchsetup.MatchSetupValidationError
+import cricket.knowledgespike.scorer.domain.repository.MatchPersistenceError
 import cricket.knowledgespike.scorer.navigation.ScorerRoute
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class MatchSetupStateStore(
     private val createMatchSetupUseCase: CreateMatchSetupUseCase,
+    private val createAndSaveMatchUseCase: CreateAndSaveMatchUseCase,
     private val onRouteRequested: (ScorerRoute) -> Unit = {},
+    private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) {
 
     private val _screenState = MutableStateFlow(MatchSetupScreenState())
@@ -30,8 +39,34 @@ class MatchSetupStateStore(
         if (event == MatchSetupScreenEvent.StartMatchRequested) {
             val matchSetup = (reducedState?.startMatchResult as? MatchSetupStartMatchResult.Ready)?.matchSetup
             if (matchSetup != null) {
-                onRouteRequested(ScorerRoute.ScoringEntryRoute(matchSetup))
+                persistAndNavigate(matchSetup)
             }
+        }
+    }
+
+    private fun persistAndNavigate(matchSetup: MatchSetup) {
+        _screenState.update {
+            it.copy(startMatchResult = MatchSetupStartMatchResult.Saving)
+        }
+
+        coroutineScope.launch {
+            createAndSaveMatchUseCase(matchSetup).fold(
+                ifLeft = { persistenceError ->
+                    _screenState.update {
+                        it.copy(
+                            startMatchResult = MatchSetupStartMatchResult.PersistenceError(
+                                persistenceError.toUiMessage(),
+                            ),
+                        )
+                    }
+                },
+                ifRight = { storedMatch ->
+                    _screenState.update {
+                        it.copy(startMatchResult = MatchSetupStartMatchResult.Saved(storedMatch.id))
+                    }
+                    onRouteRequested(ScorerRoute.ScoringEntryRoute(matchId = storedMatch.id))
+                },
+            )
         }
     }
 }
@@ -186,5 +221,15 @@ private fun MatchSetupValidationError.toUiMessage(): String {
         MatchSetupValidationError.MissingTossWinner -> "Choose the toss winner"
         MatchSetupValidationError.MissingTossDecision -> "Choose the toss decision"
         MatchSetupValidationError.InvalidMatchDate -> "Match date must use YYYY-MM-DD"
+    }
+}
+
+private fun MatchPersistenceError.toUiMessage(): String {
+    return when (this) {
+        is MatchPersistenceError.UnableToWriteMatch -> "Unable to save the match. Please try again."
+        is MatchPersistenceError.UnableToReadMatches -> "Unable to read saved matches. Please try again."
+        is MatchPersistenceError.UnableToDeleteMatch -> "Unable to delete saved matches. Please try again."
+        is MatchPersistenceError.MatchNotFound -> "Saved match not found. Please start the match again."
+        is MatchPersistenceError.InvalidStoredMatchData -> "Saved match data is invalid. Please create a new match."
     }
 }
