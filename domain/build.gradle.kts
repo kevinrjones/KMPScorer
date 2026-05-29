@@ -49,8 +49,11 @@ kotlin {
     }
 
     iosTargets.forEach { iosTarget ->
+        iosTarget.binaries.all {
+            linkerOpts("-framework", "UIKit")
+        }
         iosTarget.compilerOptions {
-            freeCompilerArgs.add("-Xoverride-konan-properties=minVersion.ios=17.0")
+            freeCompilerArgs.add("-Xoverride-konan-properties=minVersion.ios=18.5")
         }
         iosTarget.binaries.framework {
             baseName = xcfName

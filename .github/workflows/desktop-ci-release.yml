@@ -117,11 +117,12 @@ jobs:
       - name: Run Android instrumentation Compose UI tests on emulator
         uses: ReactiveCircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: 33
           arch: arm64-v8a
           target: google_apis
+          force-avd-creation: true
           disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          emulator-options: -no-window -no-snapshot -noaudio -no-boot-anim -memory 4096 -cache-size 2048
           script: |
             ./gradlew \
               :androidApp:connectedDebugAndroidTest \
